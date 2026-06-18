@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class MoveControlleer : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    //”’l‚Ì•ÏX‚Ípublic‚¶‚á‚È‚­ŠÖ”‚Ås‚¤
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [SerializeField] private float speed;
+
+
 }
