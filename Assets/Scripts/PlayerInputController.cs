@@ -16,14 +16,17 @@ public class PlayerInputController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        //ノックバック時の移動拒否
+        //ノックバック時移動拒否
         if (state.state == State.KnockBack)
         {
-
+            move.SetMoveInput(Vector2.zero);
+            state.UpdateMoveState(Vector2.zero);
+            return;
         }
         Vector2 inputVer = context.ReadValue<Vector2>();
         //ステート変更
         state.UpdateMoveState(inputVer);
+        move.SetMoveInput(inputVer);
 
     }
 

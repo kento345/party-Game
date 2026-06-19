@@ -14,7 +14,7 @@ public enum MoveState
 /// </summary>
 public enum AttackState
 {
-    None,Charge,Atatck,
+    None,Charge,Atatck,Cooldown
 }
 /// <summary>
 /// UŒ‚—Í
@@ -28,7 +28,7 @@ public enum AtackPower
 /// </summary>
 public enum State
 {
-    None,KnockBack,Hit,
+    None,KnockBack,Hit,Rigid
 }
 
 public class StateManager : MonoBehaviour
