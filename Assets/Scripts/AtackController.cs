@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AtackController : MonoBehaviour
@@ -21,6 +23,8 @@ public class AtackController : MonoBehaviour
     [Header("“–‚½‚è”»’è")]
     [SerializeField] SphereCollider attackArea; //UŒ‚”»’è
     [SerializeField] private float angle = 45f; //UŒ‚”ÍˆÍ
+    bool hasHit = false;
+
 
     Rigidbody rb;
     StateManager stateManager;
@@ -35,10 +39,110 @@ public class AtackController : MonoBehaviour
         stateManager = GetComponent<StateManager>();
     }
 
+    public void SetCharge(float value)
+    {
+        curentCharge = value;
+    }
 
+    private void Update()
+    {
+        if (stateManager.attackState == AttackState.Charge && stateManager.state != State.KnockBack)
+        {
+            if (curentCharge < chargeMax)
+            {
+                curentCharge += Time.deltaTime;
+            }
+            if (curentCharge >= chargeMax)
+            {
+                stateManager.SetAttackPower(AtackPower.Strong); 
+            }
+        }
+        if (stateManager.state == State.KnockBack)
+        {
+            SetCharge(0);
+            stateManager.SetAttackPower(AtackPower.None);
+        }
 
+        if (stateManager.state == State.Rigid)
+        {
+            if (curentRecoveryTime > 0f)
+            {
+                curentRecoveryTime -= Time.deltaTime;
+            }
+            if(curentRecoveryTime <= 0f)
+            {
+                stateManager.SetState(State.None);
+                curentRecoveryTime = StrongRecoveryTime;
+            }
+        }
+    }
 
+    public void Attack(int x)
+    {
+        if (x == 0)
+        {
+            if (stateManager.attackState == AttackState.Cooldown) { return; }
+            if (stateManager.attackState == AttackState.Charge) { return; }
+            //stateManager.SetState(State.None);
 
+            stateManager.SetAttackState(AttackState.Charge);
+        }
+        if (x == 1)
+        {
+            if (stateManager.attackState == AttackState.Cooldown || stateManager.state == State.Rigid) { return; }
 
+            if (stateManager.attackState == AttackState.Charge)
+            {
+                stateManager.SetAttackState(AttackState.Atatck);
 
+                curentKnockback = stateManager.attackPower == AtackPower.Strong ? strongKnockback : weakKnockback;
+
+                rb.AddForce(transform.forward * curentForce, ForceMode.Impulse);
+
+                Invoke("EndAttack", duration);
+            }
+        }
+    }
+    void EndAttack()
+    {
+        rb.linearVelocity = Vector3.zero;
+        stateManager.SetAttackState(AttackState.Cooldown);
+        hasHit = false;
+
+        if (stateManager.attackPower == AtackPower.Strong)
+        {
+            stateManager.SetState(State.Rigid);
+        }
+
+        stateManager.SetAttackPower(AtackPower.Weak);
+        curentCharge = 0f;
+
+        StartCoroutine(CooldownCount());
+    }
+
+    IEnumerator CooldownCount()
+    {
+        stateManager.SetAttackState(AttackState.Cooldown);
+        yield return new WaitForSeconds(cooldown);
+        stateManager.SetAttackState(AttackState.None);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if(hasHit) {return; }
+        if(stateManager == null || rb == null) return;
+
+        if(stateManager.attackState != AttackState.Atatck) {return; }
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Vector3 posDir = other.transform.position + transform.position;
+            float target_angle = Vector3.Angle(transform.forward, posDir);
+
+            var dist = Vector3.Distance(other.transform.position, transform.position);
+
+            if(target_angle > angle) { return; }
+            float radius = attackArea.radius * transform.lossyScale.x;
+            //if()
+        }
+    }
 }
