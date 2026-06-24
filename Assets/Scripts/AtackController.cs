@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class AtackController : MonoBehaviour
@@ -142,7 +143,26 @@ public class AtackController : MonoBehaviour
 
             if(target_angle > angle) { return; }
             float radius = attackArea.radius * transform.lossyScale.x;
-            //if()
+            if(target_angle <= angle && Vector3.Distance(transform.position,other.transform.position) <= radius)
+            {
+                hasHit = true;
+                //“–‚½‚Á‚½Žž‚Ìˆ—
+
+                CancelInvoke("EndAttack");
+                EndAttack();
+            }
         }
     }
+
+#if UNITY_EDITORS
+    private void OnDrawGizmos()
+    {
+        var pos = transform.position;
+        pos.y = 1.0f;
+        Handles.color = Color.red;
+        Handles.DrawSolidArc(pos, Vector3.up, Quaternion.Euler(0.0f, -angle, 0f) * transform.forward, angle * 2f, searchArea.radius);
+    }
+#endif
 }
+
+
