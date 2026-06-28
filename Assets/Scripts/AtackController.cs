@@ -42,7 +42,7 @@ public class AtackController : MonoBehaviour
 
     public void SetCharge(float value)
     {
-        curentCharge = value;
+        curentCharge = value * chargeMax;
     }
 
     private void Update()
