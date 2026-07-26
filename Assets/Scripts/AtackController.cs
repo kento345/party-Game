@@ -40,6 +40,10 @@ public class AtackController : MonoBehaviour
         stateManager = GetComponent<StateManager>();
     }
 
+    /// <summary>
+    /// チャージゲージの同期
+    /// </summary>
+    /// <param name="value"></param>
     public void SetCharge(float value)
     {
         curentCharge = value * chargeMax;
@@ -47,23 +51,27 @@ public class AtackController : MonoBehaviour
 
     private void Update()
     {
+        //ステートがチャージかつノックバック時じゃないときにチャージ処理
         if (stateManager.attackState == AttackState.Charge && stateManager.state != State.KnockBack)
         {
+            //ゲージmax以外はゲージ上昇
             if (curentCharge < chargeMax)
             {
                 curentCharge += Time.deltaTime;
             }
+            //maxなら強攻撃に
             if (curentCharge >= chargeMax)
             {
                 stateManager.SetAttackPower(AtackPower.Strong); 
             }
         }
+        //ノックバック中はゲージ0,
         if (stateManager.state == State.KnockBack)
         {
             SetCharge(0);
             stateManager.SetAttackPower(AtackPower.None);
         }
-
+        //硬直中の処理
         if (stateManager.state == State.Rigid)
         {
             if (curentRecoveryTime > 0f)
@@ -78,16 +86,20 @@ public class AtackController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// チャージ,攻撃処理
+    /// </summary>
+    /// <param name="x"></param>
     public void Attack(int x)
     {
+        //チャージ開始(ステートをチャージ中に)
         if (x == 0)
         {
-            if (stateManager.attackState == AttackState.Cooldown) { return; }
-            if (stateManager.attackState == AttackState.Charge) { return; }
-            //stateManager.SetState(State.None);
+            if (stateManager.attackState == AttackState.Cooldown || stateManager.attackState == AttackState.Charge || stateManager.state == State.Rigid) { return; }
 
             stateManager.SetAttackState(AttackState.Charge);
         }
+        //攻撃開始
         if (x == 1)
         {
             if (stateManager.attackState == AttackState.Cooldown || stateManager.state == State.Rigid) { return; }
@@ -96,31 +108,42 @@ public class AtackController : MonoBehaviour
             {
                 stateManager.SetAttackState(AttackState.Atatck);
 
+                //attackPowerステートがStrongならstrongKnockback,それ以外ならweakKnockback
                 curentKnockback = stateManager.attackPower == AtackPower.Strong ? strongKnockback : weakKnockback;
 
                 rb.AddForce(transform.forward * curentForce, ForceMode.Impulse);
 
-                Invoke("EndAttack", duration);
+                Invoke(nameof(EndAttack), duration);
             }
         }
     }
+
+    /// <summary>
+    /// 攻撃終了処理
+    /// </summary>
     void EndAttack()
     {
+        //AddForceの前に飛ばす処理を強制終了
         rb.linearVelocity = Vector3.zero;
         stateManager.SetAttackState(AttackState.Cooldown);
         hasHit = false;
 
+        //強攻撃なら硬直
         if (stateManager.attackPower == AtackPower.Strong)
         {
             stateManager.SetState(State.Rigid);
         }
 
-        stateManager.SetAttackPower(AtackPower.Weak);
+        stateManager.SetAttackPower(AtackPower.None);
         curentCharge = 0f;
 
         StartCoroutine(CooldownCount());
     }
 
+    /// <summary>
+    /// クールダウン処理
+    /// </summary>
+    /// <returns></returns>
     IEnumerator CooldownCount()
     {
         stateManager.SetAttackState(AttackState.Cooldown);
@@ -128,39 +151,46 @@ public class AtackController : MonoBehaviour
         stateManager.SetAttackState(AttackState.None);
     }
 
+    /// <summary>
+    /// 攻撃の当たり判定処理
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerStay(Collider other)
     {
-        if(hasHit) {return; }
-        if(stateManager == null || rb == null) return;
+        if(stateManager == null || rb == null || stateManager.attackState != AttackState.Atatck || hasHit) return;
 
-        if(stateManager.attackState != AttackState.Atatck) {return; }
+        //PlayerTagに当たった時
         if (other.gameObject.CompareTag("Player"))
         {
-            Vector3 posDir = other.transform.position + transform.position;
+            //相手の方向ベクトルを算出
+            Vector3 posDir = other.transform.position - transform.position;
+            //自身の正面から相手のいる位置の角度
             float target_angle = Vector3.Angle(transform.forward, posDir);
-
+            //距離を取得
             var dist = Vector3.Distance(other.transform.position, transform.position);
 
+            //攻撃範囲外はreturn
             if(target_angle > angle) { return; }
             float radius = attackArea.radius * transform.lossyScale.x;
-            if(target_angle <= angle && Vector3.Distance(transform.position,other.transform.position) <= radius)
+            //攻撃範囲内
+            if(target_angle <= angle && dist <= radius)
             {
                 hasHit = true;
                 //当たった時の処理
 
-                CancelInvoke("EndAttack");
+                CancelInvoke(nameof(EndAttack));
                 EndAttack();
             }
         }
     }
 
-#if UNITY_EDITORS
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         var pos = transform.position;
-        pos.y = 1.0f;
+        pos.y = 1.5f;
         Handles.color = Color.red;
-        Handles.DrawSolidArc(pos, Vector3.up, Quaternion.Euler(0.0f, -angle, 0f) * transform.forward, angle * 2f, searchArea.radius);
+        Handles.DrawSolidArc(pos, Vector3.up, Quaternion.Euler(0.0f, -angle, 0f) * transform.forward, angle * 2f, attackArea.radius);
     }
 #endif
 }

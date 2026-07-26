@@ -6,7 +6,8 @@ using UnityEngine;
 /// </summary>
 public enum MoveState
 {
-    Idel,Walk,
+    Idel, //停止状態
+    Walk, //移動状態
 }
 /// <summary>
 /// 攻撃ステート
@@ -14,21 +15,29 @@ public enum MoveState
 /// </summary>
 public enum AttackState
 {
-    None,Charge,Atatck,Cooldown
+    None,    //なし
+    Charge,  //チャージ中
+    Atatck,  //攻撃中
+    Cooldown //クールダウン中
 }
 /// <summary>
 /// 攻撃力
 /// </summary>
 public enum AtackPower
 {
-    None,Weak,Strong,
+    None,   //なし
+    Weak,   //弱攻撃
+    Strong, //強攻撃
 }
 /// <summary>
 /// 状態ステート
 /// </summary>
 public enum State
 {
-    None,KnockBack,Hit,Rigid
+    None,      //なし
+    KnockBack, //ノックバック中
+    Hit,       //攻撃ヒット中
+    Rigid      //硬直中
 }
 
 public class StateManager : MonoBehaviour
