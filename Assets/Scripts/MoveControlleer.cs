@@ -24,14 +24,17 @@ public class MoveControlleer : MonoBehaviour
     {
         //èâä˙âª
         speed2 = speed * moveRate;
-        rotaSpeed2 = rotaRate * rotaRate;
+        rotaSpeed2 = rotaSpeed * rotaRate;
 
-        //ScriptéÊìæ
+        //éÊìæ
         stateManager = GetComponent<StateManager>();
-        
         rb = GetComponent<Rigidbody>();
     }
 
+    /// <summary>
+    /// ì¸óÕéÛÇØéÊÇË
+    /// </summary>
+    /// <param name="input"></param>
     public void SetMoveInput(Vector2 input)
     {
         inputVer = input;
@@ -39,18 +42,13 @@ public class MoveControlleer : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
-    }
-
-    public void Move()
-    {
         curentSpeed = speed;
         curentRotaSpeed = rotaSpeed;
 
-        if(stateManager.attackState == AttackState.Charge)
+        if (stateManager.attackState == AttackState.Charge)
         {
             curentSpeed = speed2;
-            curentRotaSpeed = rotaRate;
+            curentRotaSpeed = rotaSpeed2;
         }
 
         if (stateManager.attackState != AttackState.Atatck)
@@ -58,10 +56,10 @@ public class MoveControlleer : MonoBehaviour
             Vector3 move = new Vector3(inputVer.x, 0, inputVer.y) * curentSpeed * Time.deltaTime;
             rb.MovePosition(rb.position + move);
 
-            if(move != Vector3.zero)
+            if (move != Vector3.zero)
             {
-                Quaternion Rot = Quaternion.LookRotation(move,Vector3.up);
-                rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot,curentRotaSpeed * Time.deltaTime));
+                Quaternion Rot = Quaternion.LookRotation(move, Vector3.up);
+                rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot, curentRotaSpeed * Time.deltaTime));
             }
         }
     }

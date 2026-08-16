@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputController : MonoBehaviour
 {
+    Vector2 inputVer;
+
     private StateManager state;
     private MoveControlleer move;
     private AtackController atack;
@@ -23,7 +25,7 @@ public class PlayerInputController : MonoBehaviour
             state.UpdateMoveState(Vector2.zero);
             return;
         }
-        Vector2 inputVer = context.ReadValue<Vector2>();
+        inputVer = context.ReadValue<Vector2>();
         //ステート変更
         state.UpdateMoveState(inputVer);
         move.SetMoveInput(inputVer);
@@ -34,11 +36,15 @@ public class PlayerInputController : MonoBehaviour
     {
         if (context.performed)
         {
-
+            atack.Attack(0);
         }
         if (context.canceled)
         {
-
+            atack.Attack(1);
         }
+    }
+    public Vector2 InputVer()
+    {
+        return inputVer;
     }
 }

@@ -42,10 +42,15 @@ public enum State
 
 public class StateManager : MonoBehaviour
 {
+
     public MoveState moveState {  get; private set; } = MoveState.Idel;
     public AttackState attackState { get; private set; } = AttackState.None;
     public AtackPower attackPower { get;private set; }   = AtackPower.None;
     public State state { get; private set; } = State.None;
+
+    /// <summary>
+    /// ステート更新
+    /// </summary>
 
     public void UpdateMoveState(Vector2 inputVer)
     {

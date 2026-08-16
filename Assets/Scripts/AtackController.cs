@@ -29,6 +29,7 @@ public class AtackController : MonoBehaviour
 
     Rigidbody rb;
     StateManager stateManager;
+    AnimationController animetionCon;
 
     private void Awake()
     {
@@ -38,6 +39,7 @@ public class AtackController : MonoBehaviour
         //取得
         rb = GetComponent<Rigidbody>();
         stateManager = GetComponent<StateManager>();
+        animetionCon = GetComponent<AnimationController>();
     }
 
     /// <summary>
@@ -98,6 +100,7 @@ public class AtackController : MonoBehaviour
             if (stateManager.attackState == AttackState.Cooldown || stateManager.attackState == AttackState.Charge || stateManager.state == State.Rigid) { return; }
 
             stateManager.SetAttackState(AttackState.Charge);
+            animetionCon.IsStart(true);
         }
         //攻撃開始
         if (x == 1)
@@ -106,11 +109,14 @@ public class AtackController : MonoBehaviour
 
             if (stateManager.attackState == AttackState.Charge)
             {
+                animetionCon.IsStart(false);
                 stateManager.SetAttackState(AttackState.Atatck);
 
                 //attackPowerステートがStrongならstrongKnockback,それ以外ならweakKnockback
                 curentKnockback = stateManager.attackPower == AtackPower.Strong ? strongKnockback : weakKnockback;
+                //var a = stateManager.attackPower == AtackPower.Strong ? animetionCon.IsAttack2(true) : animetionCon.IsAttack1(true);
 
+                rb.linearVelocity = Vector3.zero;
                 rb.AddForce(transform.forward * curentForce, ForceMode.Impulse);
 
                 Invoke(nameof(EndAttack), duration);
@@ -178,8 +184,13 @@ public class AtackController : MonoBehaviour
                 hasHit = true;
                 //当たった時の処理
 
-                CancelInvoke(nameof(EndAttack));
-                EndAttack();
+                knockbackController p = other.GetComponent<knockbackController>();
+                if (p != null)
+                {
+                    p.KnockBack(rb.linearVelocity.normalized, curentForce);
+                    CancelInvoke(nameof(EndAttack));
+                    EndAttack();
+                }
             }
         }
     }
