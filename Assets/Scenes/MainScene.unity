@@ -677,6 +677,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2143071267855885017, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2143071267855885017, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2143071267855885017, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2747569295512726157, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
       propertyPath: m_Name
       value: Player
@@ -720,6 +732,10 @@ PrefabInstance:
     - target: {fileID: 4316862195040603816, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5708885231241905925, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
+      propertyPath: moveRate
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 8302302586916163491, guid: 5f3a6db03feac804caf35079f7d4edc5, type: 3}
       propertyPath: m_Controller

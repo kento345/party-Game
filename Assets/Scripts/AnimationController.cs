@@ -9,6 +9,7 @@ public class AnimationController : MonoBehaviour
     float mag = 0;
 
     private PlayerInputController inpCon;
+    private StateManager stateManager;
     //private 
 
     Animator animator;
@@ -16,7 +17,7 @@ public class AnimationController : MonoBehaviour
     private void Start()
     {
         inpCon = GetComponent<PlayerInputController>();
-
+        stateManager = GetComponent<StateManager>();
         animator = GetComponentInChildren<Animator>();
     }
 
@@ -29,10 +30,13 @@ public class AnimationController : MonoBehaviour
         }
 
         animator.SetFloat("Speed",mag);
-        animator.SetBool("IsChage", isStart);
-        animator.SetBool("IsAttack1", isAttack1);
-        animator.SetBool("IsAttack2", isAttack2);
-        animator.SetBool("IsHit", isHit);
+        animator.SetInteger("IsChage", (int)stateManager.attackState);
+        animator.SetInteger("IsAttack", (int)stateManager.attackState);
+        animator.SetInteger("IsHit", (int)stateManager.state);
+        /*        animator.SetBool("IsChage", isStart);
+                animator.SetBool("IsAttack1", isAttack1);
+                animator.SetBool("IsAttack2", isAttack2);
+                animator.SetBool("IsHit", isHit);*/
     }
 
     public void IsStart(bool a) { isStart = a; } 
