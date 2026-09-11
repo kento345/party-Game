@@ -22,6 +22,7 @@ public class AtackController : MonoBehaviour
     private float curentKnockback = 0.0f;   //現在のコックバック力
 
     [Header("当たり判定")]
+    [SerializeField] LayerMask playerLayer;
     [SerializeField] SphereCollider attackArea; //攻撃判定
     [SerializeField] private float angle = 45f; //攻撃範囲
     bool hasHit = false;
@@ -166,7 +167,8 @@ public class AtackController : MonoBehaviour
         if(stateManager == null || rb == null || stateManager.attackState != AttackState.Atatck || hasHit) return;
 
         //PlayerTagに当たった時
-        if (other.gameObject.CompareTag("Player"))
+        //if (other.gameObject.CompareTag("Player"))
+        if(((1 << other.gameObject.layer) & playerLayer) != 0)
         {
             //相手の方向ベクトルを算出
             Vector3 posDir = other.transform.position - transform.position;

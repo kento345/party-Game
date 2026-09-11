@@ -10,10 +10,10 @@ public class knockbackController : MonoBehaviour
 
     private Vector3 knockbackDir;
 
-    [HideInInspector] public float smallKnockback = 1;
-
-   /* [SerializeField] private ParticleSystem hit;
-    [SerializeField] private ParticleSystem knock;*/
+    private int initLayer_;
+   private int invincibilityLayer_ = 7;
+    /* [SerializeField] private ParticleSystem hit;
+     [SerializeField] private ParticleSystem knock;*/
 
     [SerializeField] private float StunInvincibleTime = 1.0f; //無敵時間
     bool isKonckback = false;
@@ -44,6 +44,8 @@ public class knockbackController : MonoBehaviour
         ac = GetComponent<AtackController>();
         playerCon = GetComponent<PlayerInputController>();
         //botCon = GetComponent<BOTController>();
+
+        initLayer_ = gameObject.layer;
     }
 
     private void Update()
@@ -81,7 +83,7 @@ public class knockbackController : MonoBehaviour
             stateManager.SetAttackState(AttackState.None);
         }
         knockbackCounter = knockbackTime;
-        knockbackDir = pos.normalized * force * smallKnockback;
+        knockbackDir = pos.normalized * force;
         rb.linearVelocity = Vector3.zero;
 /*
         if (botCon != null)
@@ -99,17 +101,14 @@ public class knockbackController : MonoBehaviour
        /* if (hit && !hit.isPlaying)
             hit.Play();*/
         yield return new WaitForSeconds(0.05f);
-/*
-        if (hit && hit.isPlaying)
-            hit.Stop();*/
-        col.enabled = false;
-        rb.useGravity = false;
+        /*
+                if (hit && hit.isPlaying)
+                    hit.Stop();*/
+        gameObject.layer = invincibilityLayer_;
         //knock.Play();
 
         yield return new WaitForSeconds(StunInvincibleTime);
-
-        rb.useGravity = true;
-        col.enabled = true;
+        gameObject.layer = initLayer_;
         //knock.Stop();
         stateManager.SetState(State.None);
         isHit = false;
