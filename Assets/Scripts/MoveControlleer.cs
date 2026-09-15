@@ -1,39 +1,39 @@
-using System.Linq.Expressions;
+ï»¿using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.Windows;
 
 public class MoveControlleer : MonoBehaviour
 {
-    //”’l‚Ì•ÏX‚Ípublic‚¶‚á‚È‚­ŠÖ”‚Ås‚¤
-    [Header("ˆÚ“®,‰ñ“]İ’è")]
-    [SerializeField] private float speed = 15f;//ˆÚ“®‘¬“x
-    private float speed2 = 0f;//ƒ`ƒƒ[ƒW’†‚ÌˆÚ“®
-    [SerializeField] private float moveRate = 0.3f; //ˆÚ“®‘¬“x’á‰º—¦
-    float curentSpeed = 0f; //Œ»İ‚Ì‘¬“x
+    //æ•°å€¤ã®å¤‰æ›´ã¯publicã˜ã‚ƒãªãé–¢æ•°ã§è¡Œã†
+    [Header("ç§»å‹•,å›è»¢è¨­å®š")]
+    [SerializeField] private float speed = 15f;//ç§»å‹•é€Ÿåº¦
+    private float speed2 = 0f;//ãƒãƒ£ãƒ¼ã‚¸ä¸­ã®ç§»å‹•
+    [SerializeField] private float moveRate = 0.3f; //ç§»å‹•é€Ÿåº¦ä½ä¸‹ç‡
+    float curentSpeed = 0f; //ç¾åœ¨ã®é€Ÿåº¦
 
-    [SerializeField] private float rotaSpeed = 10.0f;//‰ñ“]‘¬“x
-    private float rotaSpeed2 = 0f;//ƒ`ƒƒ[ƒW’†‚Ì‰ñ“]‘¬“x
-    [SerializeField] private float rotaRate = 0.7f;//‰ñ“]‘¬“x’á‰º—¦
-    private float curentRotaSpeed = 0f;//Œ»İ‚Ì‰ñ“]‘¬“x
+    [SerializeField] private float rotaSpeed = 10.0f;//å›è»¢é€Ÿåº¦
+    private float rotaSpeed2 = 0f;//ãƒãƒ£ãƒ¼ã‚¸ä¸­ã®å›è»¢é€Ÿåº¦
+    [SerializeField] private float rotaRate = 0.7f;//å›è»¢é€Ÿåº¦ä½ä¸‹ç‡
+    private float curentRotaSpeed = 0f;//ç¾åœ¨ã®å›è»¢é€Ÿåº¦
 
-    Vector2 inputVer;  //ˆÚ“®“ü—Í
+    Vector2 inputVer;  //ç§»å‹•å…¥åŠ›
     Rigidbody rb;
 
     private StateManager stateManager;
 
     private void Awake()
     {
-        //‰Šú‰»
+        //åˆæœŸåŒ–
         speed2 = speed * moveRate;
         rotaSpeed2 = rotaSpeed * rotaRate;
 
-        //æ“¾
+        //å–å¾—
         stateManager = GetComponent<StateManager>();
         rb = GetComponent<Rigidbody>();
     }
 
     /// <summary>
-    /// “ü—Íó‚¯æ‚è
+    /// å…¥åŠ›å—ã‘å–ã‚Š
     /// </summary>
     /// <param name="input"></param>
     public void SetMoveInput(Vector2 input)
@@ -62,6 +62,7 @@ public class MoveControlleer : MonoBehaviour
                 Quaternion Rot = Quaternion.LookRotation(move, Vector3.up);
                 rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot, curentRotaSpeed * Time.deltaTime));
             }
+            stateManager.UpdateMoveState(inputVer);
         }
     }
 }

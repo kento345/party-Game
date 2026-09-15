@@ -1,43 +1,43 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
 /// <summary>
-/// ˆÚ“®ƒXƒe[ƒg
+/// ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆ
 /// </summary>
 public enum MoveState
 {
-    Idel, //’â~ó‘Ô
-    Walk, //ˆÚ“®ó‘Ô
+    Idel, //åœæ­¢çŠ¶æ…‹
+    Walk, //ç§»å‹•çŠ¶æ…‹
 }
 /// <summary>
-/// UŒ‚ƒXƒe[ƒg
-/// UŒ‚—Í‚Æ“ˆê‰Â
+/// æ”»æ’ƒã‚¹ãƒ†ãƒ¼ãƒˆ
+/// æ”»æ’ƒåŠ›ã¨çµ±ä¸€å¯
 /// </summary>
 public enum AttackState
 {
-    None,    //‚È‚µ
-    Charge,  //ƒ`ƒƒ[ƒW’†
-    Atatck,  //UŒ‚’†
-    Cooldown //ƒN[ƒ‹ƒ_ƒEƒ“’†
+    None,    //ãªã—
+    Charge,  //ãƒãƒ£ãƒ¼ã‚¸ä¸­
+    Atatck,  //æ”»æ’ƒä¸­
+    Cooldown //ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³ä¸­
 }
 /// <summary>
-/// UŒ‚—Í
+/// æ”»æ’ƒåŠ›
 /// </summary>
 public enum AtackPower
 {
-    None,   //‚È‚µ
-    Weak,   //ãUŒ‚
-    Strong, //‹­UŒ‚
+    None,   //ãªã—
+    Weak,   //å¼±æ”»æ’ƒ
+    Strong, //å¼·æ”»æ’ƒ
 }
 /// <summary>
-/// ó‘ÔƒXƒe[ƒg
+/// çŠ¶æ…‹ã‚¹ãƒ†ãƒ¼ãƒˆ
 /// </summary>
 public enum State
 {
-    None,      //‚È‚µ
-    KnockBack, //ƒmƒbƒNƒoƒbƒN’†
-    Hit,       //UŒ‚ƒqƒbƒg’†
-    Rigid      //d’¼’†
+    None,      //ãªã—
+    KnockBack, //ãƒãƒƒã‚¯ãƒãƒƒã‚¯ä¸­
+    Hit,       //æ”»æ’ƒãƒ’ãƒƒãƒˆä¸­
+    Rigid      //ç¡¬ç›´ä¸­
 }
 
 public class StateManager : MonoBehaviour
@@ -49,7 +49,7 @@ public class StateManager : MonoBehaviour
     public State state { get; private set; } = State.None;
 
     /// <summary>
-    /// ƒXƒe[ƒgXV
+    /// ã‚¹ãƒ†ãƒ¼ãƒˆæ›´æ–°
     /// </summary>
 
     public void UpdateMoveState(Vector2 inputVer)

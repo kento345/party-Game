@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AnimationController : MonoBehaviour
 {
@@ -9,6 +9,7 @@ public class AnimationController : MonoBehaviour
     float mag = 0;
 
     private PlayerInputController inpCon;
+    private BotController botCon;
     private StateManager stateManager;
     //private 
 
@@ -17,6 +18,7 @@ public class AnimationController : MonoBehaviour
     private void Start()
     {
         inpCon = GetComponent<PlayerInputController>();
+        botCon = GetComponent<BotController>();
         stateManager = GetComponent<StateManager>();
         animator = GetComponentInChildren<Animator>();
     }
@@ -27,6 +29,10 @@ public class AnimationController : MonoBehaviour
         if (inpCon != null) {
             
                 mag = inpCon.InputVer().magnitude;
+        }
+        if(botCon != null)
+        {
+            mag = botCon.InputVer().magnitude;
         }
 
         animator.SetFloat("Speed",mag);

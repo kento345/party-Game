@@ -1,30 +1,30 @@
-using System.Collections;
+ï»¿using System.Collections;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 public class AtackController : MonoBehaviour
 {
-    [Header("UŒ‚İ’è")]
-    [SerializeField] private float curentForce = 15f;//UŒ‚‹——£
-    private float duration = 0.5f;@
-    private float cooldown = 1.0f;//UŒ‚ƒN[ƒ‹ƒ_ƒEƒ“
-    //-----ƒ`ƒƒ[ƒW-------
-    private const float chargeMax = 1.0f; //Maxƒ`ƒƒ[ƒW—Ê
-    private float curentCharge = 0f;        //Œ»İ‚Ìƒ`ƒƒ[ƒW—Ê
-    //-----d’¼---------
-    private float StrongRecoveryTime = 1.0f;//d’¼ŠÔ
-    private float curentRecoveryTime;       //Œ»İ‚Ìd’¼ŠÔ
+    [Header("æ”»æ’ƒè¨­å®š")]
+    [SerializeField] private float curentForce = 15f;//æ”»æ’ƒè·é›¢
+    private float duration = 0.5f;ã€€
+    private float cooldown = 1.0f;//æ”»æ’ƒã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³
+    //-----ãƒãƒ£ãƒ¼ã‚¸-------
+    private const float chargeMax = 1.0f; //Maxãƒãƒ£ãƒ¼ã‚¸é‡
+    private float curentCharge = 0f;        //ç¾åœ¨ã®ãƒãƒ£ãƒ¼ã‚¸é‡
+    //-----ç¡¬ç›´---------
+    private float StrongRecoveryTime = 1.0f;//ç¡¬ç›´æ™‚é–“
+    private float curentRecoveryTime;       //ç¾åœ¨ã®ç¡¬ç›´æ™‚é–“
 
-    [Header("ƒmƒbƒNƒoƒbƒN,–³“Gİ’è")]
-    private float weakKnockback = 10.0f;    //ãƒmƒbƒNƒoƒbƒN—Í
-    private float strongKnockback = 20.0f;  //‹­ƒmƒbƒRƒoƒbƒN—Í
-    private float curentKnockback = 0.0f;   //Œ»İ‚ÌƒRƒbƒNƒoƒbƒN—Í
+    [Header("ãƒãƒƒã‚¯ãƒãƒƒã‚¯,ç„¡æ•µè¨­å®š")]
+    private float weakKnockback = 10.0f;    //å¼±ãƒãƒƒã‚¯ãƒãƒƒã‚¯åŠ›
+    private float strongKnockback = 20.0f;  //å¼·ãƒãƒƒã‚³ãƒãƒƒã‚¯åŠ›
+    private float curentKnockback = 0.0f;   //ç¾åœ¨ã®ã‚³ãƒƒã‚¯ãƒãƒƒã‚¯åŠ›
 
-    [Header("“–‚½‚è”»’è")]
+    [Header("å½“ãŸã‚Šåˆ¤å®š")]
     [SerializeField] LayerMask playerLayer;
-    [SerializeField] SphereCollider attackArea; //UŒ‚”»’è
-    [SerializeField] private float angle = 45f; //UŒ‚”ÍˆÍ
+    [SerializeField] SphereCollider attackArea; //æ”»æ’ƒåˆ¤å®š
+    [SerializeField] private float angle = 45f; //æ”»æ’ƒç¯„å›²
     bool hasHit = false;
 
 
@@ -34,17 +34,17 @@ public class AtackController : MonoBehaviour
 
     private void Awake()
     {
-        //‰Šú‰»
+        //åˆæœŸåŒ–
         curentRecoveryTime = StrongRecoveryTime;
 
-        //æ“¾
+        //å–å¾—
         rb = GetComponent<Rigidbody>();
         stateManager = GetComponent<StateManager>();
         animetionCon = GetComponent<AnimationController>();
     }
 
     /// <summary>
-    /// ƒ`ƒƒ[ƒWƒQ[ƒW‚Ì“¯Šú
+    /// ãƒãƒ£ãƒ¼ã‚¸ã‚²ãƒ¼ã‚¸ã®åŒæœŸ
     /// </summary>
     /// <param name="value"></param>
     public void SetCharge(float value)
@@ -54,27 +54,27 @@ public class AtackController : MonoBehaviour
 
     private void Update()
     {
-        //ƒXƒe[ƒg‚ªƒ`ƒƒ[ƒW‚©‚ÂƒmƒbƒNƒoƒbƒN‚¶‚á‚È‚¢‚Æ‚«‚Éƒ`ƒƒ[ƒWˆ—
+        //ã‚¹ãƒ†ãƒ¼ãƒˆãŒãƒãƒ£ãƒ¼ã‚¸ã‹ã¤ãƒãƒƒã‚¯ãƒãƒƒã‚¯æ™‚ã˜ã‚ƒãªã„ã¨ãã«ãƒãƒ£ãƒ¼ã‚¸å‡¦ç†
         if (stateManager.attackState == AttackState.Charge && stateManager.state != State.KnockBack)
         {
-            //ƒQ[ƒWmaxˆÈŠO‚ÍƒQ[ƒWã¸
+            //ã‚²ãƒ¼ã‚¸maxä»¥å¤–ã¯ã‚²ãƒ¼ã‚¸ä¸Šæ˜‡
             if (curentCharge < chargeMax)
             {
                 curentCharge += Time.deltaTime;
             }
-            //max‚È‚ç‹­UŒ‚‚É
+            //maxãªã‚‰å¼·æ”»æ’ƒã«
             if (curentCharge >= chargeMax)
             {
                 stateManager.SetAttackPower(AtackPower.Strong); 
             }
         }
-        //ƒmƒbƒNƒoƒbƒN’†‚ÍƒQ[ƒW0,
+        //ãƒãƒƒã‚¯ãƒãƒƒã‚¯ä¸­ã¯ã‚²ãƒ¼ã‚¸0,
         if (stateManager.state == State.KnockBack)
         {
             SetCharge(0);
             stateManager.SetAttackPower(AtackPower.None);
         }
-        //d’¼’†‚Ìˆ—
+        //ç¡¬ç›´ä¸­ã®å‡¦ç†
         if (stateManager.state == State.Rigid)
         {
             if (curentRecoveryTime > 0f)
@@ -90,30 +90,30 @@ public class AtackController : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒ`ƒƒ[ƒW,UŒ‚ˆ—
+    /// ãƒãƒ£ãƒ¼ã‚¸,æ”»æ’ƒå‡¦ç†
     /// </summary>
     /// <param name="x"></param>
-    public void Attack(int x)
+    public void Attack(AttackState state)
     {
-        //ƒ`ƒƒ[ƒWŠJn(ƒXƒe[ƒg‚ğƒ`ƒƒ[ƒW’†‚É)
-        if (x == 0)
+        //ãƒãƒ£ãƒ¼ã‚¸é–‹å§‹(ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ãƒãƒ£ãƒ¼ã‚¸ä¸­ã«)
+        if (state == AttackState.Charge)
         {
             if (stateManager.attackState == AttackState.Cooldown || stateManager.attackState == AttackState.Charge || stateManager.state == State.Rigid) { return; }
 
-            stateManager.SetAttackState(AttackState.Charge);
+            stateManager.SetAttackState(state);
             animetionCon.IsStart(true);
         }
-        //UŒ‚ŠJn
-        if (x == 1)
+        //æ”»æ’ƒé–‹å§‹
+        if (state == AttackState.Atatck)
         {
             if (stateManager.attackState == AttackState.Cooldown || stateManager.state == State.Rigid) { return; }
 
             if (stateManager.attackState == AttackState.Charge)
             {
                 animetionCon.IsStart(false);
-                stateManager.SetAttackState(AttackState.Atatck);
+                stateManager.SetAttackState(state);
 
-                //attackPowerƒXƒe[ƒg‚ªStrong‚È‚çstrongKnockback,‚»‚êˆÈŠO‚È‚çweakKnockback
+                //attackPowerã‚¹ãƒ†ãƒ¼ãƒˆãŒStrongãªã‚‰strongKnockback,ãã‚Œä»¥å¤–ãªã‚‰weakKnockback
                 curentKnockback = stateManager.attackPower == AtackPower.Strong ? strongKnockback : weakKnockback;
                 //var a = stateManager.attackPower == AtackPower.Strong ? animetionCon.IsAttack2(true) : animetionCon.IsAttack1(true);
 
@@ -126,16 +126,16 @@ public class AtackController : MonoBehaviour
     }
 
     /// <summary>
-    /// UŒ‚I—¹ˆ—
+    /// æ”»æ’ƒçµ‚äº†å‡¦ç†
     /// </summary>
     void EndAttack()
     {
-        //AddForce‚Ì‘O‚É”ò‚Î‚·ˆ—‚ğ‹­§I—¹
+        //AddForceã®å‰ã«é£›ã°ã™å‡¦ç†ã‚’å¼·åˆ¶çµ‚äº†
         rb.linearVelocity = Vector3.zero;
         stateManager.SetAttackState(AttackState.Cooldown);
         hasHit = false;
 
-        //‹­UŒ‚‚È‚çd’¼
+        //å¼·æ”»æ’ƒãªã‚‰ç¡¬ç›´
         if (stateManager.attackPower == AtackPower.Strong)
         {
             stateManager.SetState(State.Rigid);
@@ -148,7 +148,7 @@ public class AtackController : MonoBehaviour
     }
 
     /// <summary>
-    /// ƒN[ƒ‹ƒ_ƒEƒ“ˆ—
+    /// ã‚¯ãƒ¼ãƒ«ãƒ€ã‚¦ãƒ³å‡¦ç†
     /// </summary>
     /// <returns></returns>
     IEnumerator CooldownCount()
@@ -159,32 +159,32 @@ public class AtackController : MonoBehaviour
     }
 
     /// <summary>
-    /// UŒ‚‚Ì“–‚½‚è”»’èˆ—
+    /// æ”»æ’ƒã®å½“ãŸã‚Šåˆ¤å®šå‡¦ç†
     /// </summary>
     /// <param name="other"></param>
     private void OnTriggerStay(Collider other)
     {
         if(stateManager == null || rb == null || stateManager.attackState != AttackState.Atatck || hasHit) return;
 
-        //PlayerTag‚É“–‚½‚Á‚½
+        //PlayerTagã«å½“ãŸã£ãŸæ™‚
         //if (other.gameObject.CompareTag("Player"))
         if(((1 << other.gameObject.layer) & playerLayer) != 0)
         {
-            //‘Šè‚Ì•ûŒüƒxƒNƒgƒ‹‚ğZo
+            //ç›¸æ‰‹ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
             Vector3 posDir = other.transform.position - transform.position;
-            //©g‚Ì³–Ê‚©‚ç‘Šè‚Ì‚¢‚éˆÊ’u‚ÌŠp“x
+            //è‡ªèº«ã®æ­£é¢ã‹ã‚‰ç›¸æ‰‹ã®ã„ã‚‹ä½ç½®ã®è§’åº¦
             float target_angle = Vector3.Angle(transform.forward, posDir);
-            //‹——£‚ğæ“¾
+            //è·é›¢ã‚’å–å¾—
             var dist = Vector3.Distance(other.transform.position, transform.position);
 
-            //UŒ‚”ÍˆÍŠO‚Íreturn
+            //æ”»æ’ƒç¯„å›²å¤–ã¯return
             if(target_angle > angle) { return; }
             float radius = attackArea.radius * transform.lossyScale.x;
-            //UŒ‚”ÍˆÍ“à
+            //æ”»æ’ƒç¯„å›²å†…
             if(target_angle <= angle && dist <= radius)
             {
                 hasHit = true;
-                //“–‚½‚Á‚½‚Ìˆ—
+                //å½“ãŸã£ãŸæ™‚ã®å‡¦ç†
 
                 knockbackController p = other.GetComponent<knockbackController>();
                 if (p != null)

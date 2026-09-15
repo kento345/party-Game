@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputController : MonoBehaviour
@@ -18,7 +18,7 @@ public class PlayerInputController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        //ƒmƒbƒNƒoƒbƒNˆÚ“®‹‘”Û
+        //ãƒãƒƒã‚¯ãƒãƒƒã‚¯æ™‚ç§»å‹•æ‹’å¦
         if (state.state == State.KnockBack)
         {
             move.SetMoveInput(Vector2.zero);
@@ -26,8 +26,8 @@ public class PlayerInputController : MonoBehaviour
             return;
         }
         inputVer = context.ReadValue<Vector2>();
-        //ƒXƒe[ƒg•ÏX
-        state.UpdateMoveState(inputVer);
+        //å…¥åŠ›ã®æ›´æ–°
+        //state.UpdateMoveState(inputVer);
         move.SetMoveInput(inputVer);
 
     }
@@ -36,11 +36,11 @@ public class PlayerInputController : MonoBehaviour
     {
         if (context.performed)
         {
-            atack.Attack(0);
+            atack.Attack(AttackState.Charge);
         }
         if (context.canceled)
         {
-            atack.Attack(1);
+            atack.Attack(AttackState.Atatck);
         }
     }
     public Vector2 InputVer()

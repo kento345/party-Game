@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class knockbackController : MonoBehaviour
@@ -98,21 +98,14 @@ public class knockbackController : MonoBehaviour
     {
         isHit = true;
         stateManager.SetState(State.KnockBack);
-       /* if (hit && !hit.isPlaying)
-            hit.Play();*/
+
         yield return new WaitForSeconds(0.05f);
-        /*
-                if (hit && hit.isPlaying)
-                    hit.Stop();*/
+
         gameObject.layer = invincibilityLayer_;
-        //knock.Play();
 
         yield return new WaitForSeconds(StunInvincibleTime);
         gameObject.layer = initLayer_;
-        //knock.Stop();
         stateManager.SetState(State.None);
         isHit = false;
-       /* if (animeCon.isHit)
-            animeCon.isHit = false;*/
     }
 }
