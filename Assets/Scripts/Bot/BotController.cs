@@ -115,6 +115,7 @@ public class BotController : MonoBehaviour
     /// で初期化される。</remarks>
     void NearPlayer()
     {
+        //if(GameManager.Instance.playerList == null)return;
         //初期化
         curentNearDistance = Mathf.Infinity;
         nearPlayer = null;
@@ -144,4 +145,12 @@ public class BotController : MonoBehaviour
     {
         return inputVer;
     }
+
+/*
+ *-----BOTの行動パターン-----
+ * 1:近くの敵を探索
+ * 2:ターゲットの方向に移動
+ * 3:距離によって攻撃開始
+ * 4:攻撃後待機させ再度探索
+ */
 }
