@@ -1,5 +1,7 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections;
+using System.Linq.Expressions;
 using UnityEngine;
+using UnityEngine.LowLevelPhysics;
 using UnityEngine.Windows;
 
 public class MoveControlleer : MonoBehaviour
@@ -15,6 +17,8 @@ public class MoveControlleer : MonoBehaviour
     private float rotaSpeed2 = 0f;//チャージ中の回転速度
     [SerializeField] private float rotaRate = 0.7f;//回転速度低下率
     private float curentRotaSpeed = 0f;//現在の回転速度
+
+    public bool isRotating = false; //回転中かどうか
 
     Vector2 inputVer;  //移動入力
     Rigidbody rb;
@@ -64,5 +68,25 @@ public class MoveControlleer : MonoBehaviour
             }
             stateManager.UpdateMoveState(inputVer);
         }
+        if(stateManager.moveState == MoveState.Idel)
+        {
+            if (isRotating)
+            {
+                Debug.Log("回転中");
+                // Y軸を回転し続ける
+                rb.angularVelocity = Vector3.up * curentRotaSpeed;
+            }
+            else if(!isRotating)
+            {
+                Debug.Log("回転停止");
+                // 回転を止める
+                rb.angularVelocity = Vector3.zero;
+            }
+        } 
+    }
+
+    public void Rotate(bool x)
+    {
+        isRotating = x;
     }
 }

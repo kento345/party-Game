@@ -180,8 +180,9 @@ public class AtackController : MonoBehaviour
             //攻撃範囲外はreturn
             if(target_angle > angle) { return; }
             float radius = attackArea.radius * transform.lossyScale.x;
+
             //攻撃範囲内
-            if(target_angle <= angle && dist <= radius)
+            if (target_angle <= angle && dist <= radius)
             {
                 hasHit = true;
                 //当たった時の処理

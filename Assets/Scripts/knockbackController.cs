@@ -18,32 +18,17 @@ public class knockbackController : MonoBehaviour
     [SerializeField] private float StunInvincibleTime = 1.0f; //無敵時間
     bool isKonckback = false;
     private bool isHit = false;
-    Collider col;
     Rigidbody rb;
 
     //-----Script参照-----
     private StateManager stateManager;
-    private CharacterController cs;
-    //private AnimatorController animeCon;
-
-    private AtackController ac;
-    private PlayerInputController playerCon;
-    //private BOTController botCon;
+    private AtackController atack;
 
     private void Start()
     {
-  /*      hit.Stop();
-        knock.Stop();*/
-
         rb = GetComponent<Rigidbody>();
-        //animator = GetComponent<Animator>();
-        col = GetComponent<Collider>();
         stateManager = GetComponent<StateManager>();
-        cs = GetComponent<CharacterController>();
-        //animeCon = GetComponent<AnimatorController>();
-        ac = GetComponent<AtackController>();
-        playerCon = GetComponent<PlayerInputController>();
-        //botCon = GetComponent<BOTController>();
+        atack = GetComponent<AtackController>();
 
         initLayer_ = gameObject.layer;
     }
@@ -56,7 +41,6 @@ public class knockbackController : MonoBehaviour
             if (knockbackCounter <= 0)
             {
                 isKonckback = false;
-                //stateManager.SetState(State.None);
                 rb.linearVelocity = Vector3.zero;
             }
         }
@@ -71,12 +55,12 @@ public class knockbackController : MonoBehaviour
 
     public void KnockBack(Vector3 pos, float force)
     {
+        Debug.Log("KnockBack" + gameObject.name);
         if (isHit) return;
-        //animeCon.isHit = true;
         isKonckback = true;
-        if (ac != null)
+        if (atack != null)
         {
-            ac.SetCharge(0);
+            atack.SetCharge(0);
         }
         if (stateManager != null)
         {
@@ -85,12 +69,6 @@ public class knockbackController : MonoBehaviour
         knockbackCounter = knockbackTime;
         knockbackDir = pos.normalized * force;
         rb.linearVelocity = Vector3.zero;
-/*
-        if (botCon != null)
-        {
-            botCon.OnMove(Vector2.zero);
-        }*/
-
         StartCoroutine(Hit());
     }
 
