@@ -55,7 +55,6 @@ public class knockbackController : MonoBehaviour
 
     public void KnockBack(Vector3 pos, float force)
     {
-        Debug.Log("KnockBack" + gameObject.name);
         if (isHit) return;
         isKonckback = true;
         if (atack != null)

@@ -14,9 +14,9 @@ public class BotController : MonoBehaviour
 
 
     [Header("攻撃設定")]
-    //int atackDis;             //攻撃距離
-    float chargeTime = 0.0f;      //チャージ時間
-    bool isCharging = false;  //チャージ状態
+    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private BoxCollider atackCollider; //攻撃判定
+    bool isCharging = false;    //チャージ状態
 
     [Header("地面判定設定")]
     [SerializeField]private LayerMask groundLayer;
@@ -39,71 +39,85 @@ public class BotController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //初期化
-        var origin = transform.position + transform.forward * 1f + Vector3.up;
-        //Rayの作成
-        var ray = new Ray(origin, Vector3.down);
-        Debug.DrawRay(ray.origin, ray.direction * rayDistance,Color.red,0, false);
+         //-----移動-----
+         //初期化
+         var origin = transform.position + transform.forward * 1f + Vector3.up;
+         //Rayの作成
+         var ray = new Ray(origin, Vector3.down);
+         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red, 0, false);
 
-        //Rayの当たり判定
-        if (Physics.Raycast(ray, out RaycastHit hit, rayDistance))
-        {
-            //Groundに接触中の判定
-            if (((1 << hit.collider.gameObject.layer) & groundLayer) != 0) {
-                move.Rotate(false);
-                //近いPlayerに移動
+         //Rayの当たり判定
+         if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, groundLayer))
+         {
+             //Groundに接触中の判定
+
+             if (move.IsRotating())
+             {
+                 move.SetMoveInput(Vector2.zero);
+                 return;
+             }
+            //近いPlayerに移動
+            if (state.attackState != AttackState.Atatck && state.attackState != AttackState.Cooldown && !isCharging)
+            {
                 NearPlayer();
-                if (nearPlayer != null)
-                {
-                    //ターゲットの方向を取得して正規化
-                    var dir = nearPlayer.transform.position - transform.position;
-                    var nomalize = dir.normalized;
-                    //正規化した方向をVector2に変換
-                    inputVer = new Vector2(nomalize.x, nomalize.z);
-
-                    //KnockBack状態になった場合は移動を止める
-                    if (state.state == State.KnockBack)
-                    {
-                        move.SetMoveInput(Vector2.zero);
-                        state.UpdateMoveState(Vector2.zero);
-                        return;
-                    }
-                    // 距離が10未満になったらチャージ開始
-                    if (dir.magnitude < 6f)
-                    {
-                        if(!isCharging)
-                        {
-                            chargeTime = Random.Range(1.0f, 3.0f);
-                            isCharging = true;
-                        }
-                        if (isCharging)
-                        {
-                            chargeTime -= Time.deltaTime;
-                            atack.Attack(AttackState.Charge);
-                            if (chargeTime <= 0.0f)
-                            {
-                                atack.Attack(AttackState.Atatck);
-                                chargeTime = 0.0f;
-                                isCharging = false;
-
-                                previousPlayer = nearPlayer;
-                                nearPlayer = null;
-                            }
-                        }
-                    } 
-                }
-                if (state.state == State.None && (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown || state.attackState == AttackState.Charge))
-                {
-                    //入力の更新
-                    move.SetMoveInput(inputVer);
-                }
             }
-        }
-        //Rayに何も接触していなかったとき
-        else
+
+
+            //チャージ開始
+            if (nearPlayer != null)
+             {
+                //ターゲットの方向を取得して正規化
+                 var dir = nearPlayer.transform.position - transform.position;
+                 dir.y = 0;
+                 var nomalize = dir.normalized;
+                 //正規化した方向をVector2に変換
+                 inputVer = new Vector2(nomalize.x, nomalize.z);
+                 
+                 //KnockBack状態になった場合は移動を止める
+                 if (state.state == State.KnockBack)
+                 {
+                     move.SetMoveInput(Vector2.zero);
+                     state.UpdateMoveState(Vector2.zero);
+                     return;
+                 }
+                if (!isCharging)
+                {
+                    isCharging = true;
+                }
+                if (isCharging)
+                {
+                    atack.Attack(AttackState.Charge);
+
+                    atackCollider.enabled = true;
+                }
+             }
+             if (state.state == State.None && (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown || state.attackState == AttackState.Charge))
+             {
+                 //入力の更新
+                 move.SetMoveInput(inputVer);
+             }
+             //--------------
+         }
+    }
+
+    /// <summary>
+    /// 近接プレイヤーがトリガーに入った際に移動を停止して攻撃を開始し、攻撃コライダーを無効化する。
+    /// </summary>
+    /// <remarks>攻撃コライダーを無効化し、move.SetMoveInput(Vector2.zero) で移動入力を停止、atack.Attack(AttackState.Atatck)
+    /// で攻撃を開始する。isCharging を false に設定し、previousPlayer を更新して nearPlayer をクリアする。</remarks>
+    /// <param name="other">トリガーに入ったコライダー。近接プレイヤーとの照合に使用される。</param>
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject == nearPlayer)
         {
+            atackCollider.enabled = false;
+
             move.SetMoveInput(Vector2.zero);
-            move.Rotate(true);
+            atack.Attack(AttackState.Atatck);
+
+            isCharging = false;
+            previousPlayer = nearPlayer;
+            nearPlayer = null;
         }
     }
 
@@ -145,7 +159,6 @@ public class BotController : MonoBehaviour
     {
         return inputVer;
     }
-
 /*
  *-----BOTの行動パターン-----
  * 1:近くの敵を探索
