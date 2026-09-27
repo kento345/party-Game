@@ -56,10 +56,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6e729727772a0478d1e76dd6bce5cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BotController
-  playerLayer:
+  Atacklayer:
     serializedVersion: 2
-    m_Bits: 64
-  atackDistance: 8
+    m_Bits: 512
+  atackCollider: {fileID: 8962918052387151068}
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -208,7 +208,7 @@ GameObject:
   m_Component:
   - component: {fileID: 358446127089749349}
   - component: {fileID: 7237500385695404176}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: AttackRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -277,7 +277,7 @@ Transform:
   m_GameObject: {fileID: 5750178425640162439}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 8}
+  m_LocalPosition: {x: 0, y: 1, z: 6.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -300,10 +300,10 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1, z: 6.2052517}
+  m_Center: {x: 0, y: 0, z: -2.6026263}
 --- !u!1001 &951578562278611250
 PrefabInstance:
   m_ObjectHideFlags: 0

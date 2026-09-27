@@ -20,6 +20,11 @@ public class knockbackController : MonoBehaviour
     private bool isHit = false;
     Rigidbody rb;
 
+    //---BOT---
+    GameObject AttackObj;
+
+    public GameObject Target() => AttackObj;
+
     //-----Script参照-----
     private StateManager stateManager;
     private AtackController atack;
@@ -53,7 +58,7 @@ public class knockbackController : MonoBehaviour
         }
     }
 
-    public void KnockBack(Vector3 pos, float force)
+    public void KnockBack(Vector3 pos, float force,GameObject obj)
     {
         if (isHit) return;
         isKonckback = true;
@@ -65,6 +70,7 @@ public class knockbackController : MonoBehaviour
         {
             stateManager.SetAttackState(AttackState.None);
         }
+        AttackObj = obj;
         knockbackCounter = knockbackTime;
         knockbackDir = pos.normalized * force;
         rb.linearVelocity = Vector3.zero;

@@ -190,7 +190,7 @@ public class AtackController : MonoBehaviour
                 knockbackController p = other.GetComponent<knockbackController>();
                 if (p != null)
                 {
-                    p.KnockBack(rb.linearVelocity.normalized, curentForce);
+                    p.KnockBack(rb.linearVelocity.normalized, curentForce,this.gameObject);
                     CancelInvoke(nameof(EndAttack));
                     EndAttack();
                 }
