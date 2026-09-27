@@ -3,11 +3,11 @@
 public class BotController : MonoBehaviour
 {
     [Header("移動,回転設定")]
-    float delaiTime = 3f;
-    float time = 0f;
-    bool isDelai = true;
-    bool wasKnockBack = false;
-    bool isChaseAttacker = false;
+    float delaiTime = 3f;         //探索ディレイ
+    float time = 0f;              //
+    bool isDelai = true;          //ディレイフラグ
+    bool wasKnockBack = false;    //ノックバック中フラグ
+    bool isAttacker = false;      //攻撃を受けたかフラグ
     Vector2 inputVer;           //入力方向
     float curentNearDistance;   //現在の近い距離
     GameObject curentTarget;    //現在のターゲット
@@ -65,6 +65,7 @@ public class BotController : MonoBehaviour
                 state.UpdateMoveState(Vector2.zero);
                 return;
             }
+            //攻撃受けた後のターゲット変更
             if (wasKnockBack)
             {
                 wasKnockBack = false;
@@ -72,12 +73,13 @@ public class BotController : MonoBehaviour
 
                 if (curentTarget != null)
                 {
-                    isChaseAttacker = true;
+                    isAttacker = true;
                 }
             }
             //近いPlayerに移動
-            if (state.attackState == AttackState.None && !isChaseAttacker)
+            if (state.attackState == AttackState.None && !isAttacker)
             {
+                //3秒待って近くのPlayer探索
                 if (time > 0)
                 {
                     time -= Time.deltaTime;
@@ -132,7 +134,7 @@ public class BotController : MonoBehaviour
             previousPlayer = curentTarget;
             nearPlayer = null;
             curentTarget = null;
-            isChaseAttacker = false;
+            isAttacker = false;
 
             time = delaiTime;
             isDelai = false;
