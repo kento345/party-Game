@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.LowLevelPhysics;
-using UnityEngine.Windows;
+﻿using UnityEngine;
 
 public class MoveControlleer : MonoBehaviour
 {
@@ -18,9 +13,6 @@ public class MoveControlleer : MonoBehaviour
     private float rotaSpeed2 = 0f;//チャージ中の回転速度
     [SerializeField] private float rotaRate = 0.7f;//回転速度低下率
     private float curentRotaSpeed = 0f;//現在の回転速度
-
-    private bool isRotating = false; //回転中かどうか
-    private float targetRotationY = 0f; //目標の回転角度
 
     Vector2 inputVer;  //移動入力
     Rigidbody rb;
@@ -62,68 +54,15 @@ public class MoveControlleer : MonoBehaviour
         if (stateManager.attackState != AttackState.Atatck)
         {
             //移動処理
-            Vector3 move = new Vector3(inputVer.x, 0, inputVer.y) * curentSpeed * Time.deltaTime;
+            Vector3 move = new Vector3(inputVer.x, 0, inputVer.y) * curentSpeed * Time.fixedDeltaTime;
             rb.MovePosition(rb.position + move);
             //回転処理
-            if (move != Vector3.zero && !isRotating)
+            if (move != Vector3.zero)
             {
                 Quaternion Rot = Quaternion.LookRotation(move, Vector3.up);
-                rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot, curentRotaSpeed * Time.deltaTime));
+                rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot, curentRotaSpeed * Time.fixedDeltaTime));
             }
             stateManager.UpdateMoveState(inputVer);
         }
-        //場外の手前での回転処理
-        if (stateManager.moveState == MoveState.Idel)
-        {
-            if (isRotating)
-            {
-                float currentY = rb.rotation.eulerAngles.y;
-
-                float angle = Mathf.DeltaAngle(currentY, targetRotationY);
-
-                if (Mathf.Abs(angle) <= 0.5f)
-                {
-                    rb.MoveRotation(Quaternion.Euler(0f, targetRotationY, 0f));
-                    inputVer = Vector2.zero;
-
-                    isRotating = false;
-                }
-                else
-                {
-                    float rotationAmount = Mathf.Sign(angle) * 100 * Time.fixedDeltaTime;
-
-                    rotationAmount = Mathf.Clamp(rotationAmount, -Mathf.Abs(angle), Mathf.Abs(angle));
-                    Quaternion deltaRotation = Quaternion.Euler(0f, rotationAmount, 0f);
-                    rb.MoveRotation(rb.rotation * deltaRotation);
-                }
-            }
-        } 
-    }
-
-    /// <summary>
-    /// 180度回転処理
-    /// </summary>
-    /// <param name="x"></param>
-    public void Rotate(bool x)
-    {
-        if (x && !isRotating)
-        {
-            isRotating = true;
-
-            // 現在のY角度 + 180度を目標にする
-            targetRotationY = rb.rotation.eulerAngles.y + 180f;
-
-            // 0～360度に収める
-            targetRotationY %= 360f;
-        }
-    }
-
-    /// <summary>
-    /// 回転の状態
-    /// </summary>
-    /// <returns></returns>
-    public bool IsRotating()
-    {
-        return isRotating;
     }
 }

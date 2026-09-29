@@ -14,12 +14,17 @@ public class BotController : MonoBehaviour
     GameObject nearPlayer;      //近くのPlayer  
     GameObject previousPlayer;  //前回のPlayer
 
+
+    public Vector2 InputVer() => inputVer;  //入力値を参照
+
     [Header("攻撃設定")]
     [SerializeField] private BoxCollider atackCollider; //攻撃判定
 
     [Header("地面判定設定")]
     [SerializeField]private LayerMask groundLayer;
-    private float rayDistance = 2;
+    private float rayDistance = 2;        //Rayの長さ
+
+
 
     //Script
     private StateManager state;
@@ -39,82 +44,106 @@ public class BotController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {        
+    {
         //初期化
         var origin = transform.position + transform.forward * 1f + Vector3.up;
         //Rayの作成
         var ray = new Ray(origin, Vector3.down);
         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red, 0, false);
 
-        //Rayの当たり判定(Groundに接触中の判定)
-        if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, groundLayer))
+        //Rayの当たり判定フラグ
+        bool hasGround = Physics.Raycast(ray, out RaycastHit hit, rayDistance, groundLayer);
+
+        //地面がない時
+        if (!hasGround)
         {
-            //回転中は移動しない
-            if (move.IsRotating())
-            {
-                move.SetMoveInput(Vector2.zero);
-                state.UpdateMoveState(Vector2.zero);
-                return;
-            }
-            //ノックバック時移動拒否
-            if (state.state == State.KnockBack)
-            {
-                wasKnockBack = true;
+            OnMove(Vector2.zero);
 
-                move.SetMoveInput(Vector2.zero);
-                state.UpdateMoveState(Vector2.zero);
-                return;
-            }
-            //攻撃受けた後のターゲット変更
-            if (wasKnockBack)
-            {
-                wasKnockBack = false;
-                curentTarget = knock.Target();
+            curentTarget = null;
+            nearPlayer = null;
 
-                if (curentTarget != null)
-                {
-                    isAttacker = true;
-                }
-            }
-            //近いPlayerに移動
-            if (state.attackState == AttackState.None && !isAttacker)
-            {
-                //3秒待って近くのPlayer探索
-                if (time > 0)
-                {
-                    time -= Time.deltaTime;
-                    if (time <= 0)
-                    {
-                        isDelai = true;
-                    }
-                }
-                if (isDelai)
-                {
-                    NearPlayer();
-                    curentTarget = nearPlayer;
-                    isDelai = false;
-                }
-            }
+            atackCollider.enabled = false;
 
+            NearPlayer();
 
-            //チャージ開始
+            curentTarget = nearPlayer;
+
             if (curentTarget != null)
             {
-                //ターゲットの方向を取得して正規化
                 var dir = curentTarget.transform.position - transform.position;
                 dir.y = 0;
-                var nomalize = dir.normalized;
-                //正規化した方向をVector2に変換
-                inputVer = new Vector2(nomalize.x, nomalize.z);
 
-                atack.Attack(AttackState.Charge);
-                atackCollider.enabled = true;
-            }
-            if (state.state == State.None && (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown || state.attackState == AttackState.Charge))
-            {
-                //入力の更新
+                var normalize = dir.normalized;
+                inputVer = new Vector2(normalize.x, normalize.z);
+
+                // Player方向へ移動
                 move.SetMoveInput(inputVer);
             }
+            else
+            {
+                OnMove(Vector2.zero);
+            }
+
+            return;
+        }
+        //ノックバック時移動拒否
+        if (state.state == State.KnockBack)
+        {
+            wasKnockBack = true;
+            OnMove(Vector2.zero);
+            return;
+        }
+        //攻撃受けた後のターゲット変更
+        /*            if (wasKnockBack)
+                    {
+                        wasKnockBack = false;
+                        curentTarget = knock.Target();
+
+                        if (curentTarget != null)
+                        {
+                            isAttacker = true;
+                        }
+                    }*/
+        //近いPlayerに移動
+        if (state.attackState == AttackState.None && !isAttacker)
+        {
+            //3秒待って近くのPlayer探索
+            if (time > 0)
+            {
+                time -= Time.deltaTime;
+                if (time <= 0)
+                {
+                    isDelai = true;
+                }
+            }
+            if (isDelai)
+            {
+                NearPlayer();
+                curentTarget = nearPlayer;
+                isDelai = false;
+            }
+        }
+
+        //チャージ開始
+        if (curentTarget != null)
+        {
+            //ターゲットの方向を取得して正規化
+            var dir = curentTarget.transform.position - transform.position;
+            dir.y = 0;
+            var nomalize = dir.normalized;
+            //正規化した方向をVector2に変換
+            inputVer = new Vector2(nomalize.x, nomalize.z);
+
+            atack.Attack(AttackState.Charge);
+            atackCollider.enabled = true;
+        }
+        if (state.state == State.None && 
+           (state.attackState == AttackState.None || 
+            state.attackState == AttackState.Cooldown || 
+            state.attackState == AttackState.Charge))
+        {
+            //入力の更新
+            move.SetMoveInput(inputVer);
         }
     }
 
@@ -172,18 +201,21 @@ public class BotController : MonoBehaviour
     }
 
     /// <summary>
-    /// 入力値を参照
+    /// 入力値などの変更
     /// </summary>
-    /// <returns></returns>
-    public Vector2 InputVer()
+    /// <param name="context"></param>
+    void OnMove(Vector2 context)
     {
-        return inputVer;
+        state.UpdateMoveState(context);
+        move.SetMoveInput(context);
+        inputVer = context;
     }
-/*
- *-----BOTの行動パターン-----
- * 1:近くの敵を探索
- * 2:ターゲットの方向に移動
- * 3:距離によって攻撃開始
- * 4:攻撃後待機させ再度探索
- */
+
+    /*
+     *-----BOTの行動パターン-----
+     * 1:近くの敵を探索
+     * 2:ターゲットの方向に移動
+     * 3:距離によって攻撃開始
+     * 4:攻撃後待機させ再度探索
+     */
 }
