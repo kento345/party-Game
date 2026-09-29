@@ -1,13 +1,9 @@
-﻿using UnityEngine;
+﻿using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 
 public class BotController : MonoBehaviour
 {
     [Header("移動,回転設定")]
-    float delaiTime = 3f;         //探索ディレイ
-    float time = 0f;              //
-    bool isDelai = true;          //ディレイフラグ
-    bool wasKnockBack = false;    //ノックバック中フラグ
-    bool isAttacker = false;      //攻撃を受けたかフラグ
     Vector2 inputVer;           //入力方向
     float curentNearDistance;   //現在の近い距離
     GameObject curentTarget;    //現在のターゲット
@@ -19,6 +15,9 @@ public class BotController : MonoBehaviour
 
     [Header("攻撃設定")]
     [SerializeField] private BoxCollider atackCollider; //攻撃判定
+    bool isAttack = false;
+    bool wasKnockBack = false;    //ノックバック中フラグ
+
 
     [Header("地面判定設定")]
     [SerializeField]private LayerMask groundLayer;
@@ -65,7 +64,6 @@ public class BotController : MonoBehaviour
             atackCollider.enabled = false;
 
             NearPlayer();
-
             curentTarget = nearPlayer;
 
             if (curentTarget != null)
@@ -94,34 +92,23 @@ public class BotController : MonoBehaviour
             return;
         }
         //攻撃受けた後のターゲット変更
-        /*            if (wasKnockBack)
-                    {
-                        wasKnockBack = false;
-                        curentTarget = knock.Target();
-
-                        if (curentTarget != null)
-                        {
-                            isAttacker = true;
-                        }
-                    }*/
-        //近いPlayerに移動
-        if (state.attackState == AttackState.None && !isAttacker)
+        if (wasKnockBack)
         {
-            //3秒待って近くのPlayer探索
-            if (time > 0)
+            wasKnockBack = false;
+            curentTarget = knock.Target();
+
+            if (curentTarget != null)
             {
-                time -= Time.deltaTime;
-                if (time <= 0)
-                {
-                    isDelai = true;
-                }
+                isAttack = true;
             }
-            if (isDelai)
-            {
-                NearPlayer();
-                curentTarget = nearPlayer;
-                isDelai = false;
-            }
+        }
+        //近いPlayerに移動
+        Debug.Log(state.attackState);
+       
+        if (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown && !isAttack)
+        {
+            NearPlayer();
+            curentTarget = nearPlayer;
         }
 
         //チャージ開始
@@ -133,18 +120,21 @@ public class BotController : MonoBehaviour
             var nomalize = dir.normalized;
             //正規化した方向をVector2に変換
             inputVer = new Vector2(nomalize.x, nomalize.z);
+            if (state.state == State.None &&
+               (state.attackState == AttackState.None ||
+                state.attackState == AttackState.Cooldown ||
+                state.attackState == AttackState.Charge))
+            {
+                //入力の更新
+                move.SetMoveInput(inputVer);
+            }
+            if (state.attackState == AttackState.None)
+            {
+                atack.Attack(AttackState.Charge);
+                atackCollider.enabled = true;
+            }
+        }
 
-            atack.Attack(AttackState.Charge);
-            atackCollider.enabled = true;
-        }
-        if (state.state == State.None && 
-           (state.attackState == AttackState.None || 
-            state.attackState == AttackState.Cooldown || 
-            state.attackState == AttackState.Charge))
-        {
-            //入力の更新
-            move.SetMoveInput(inputVer);
-        }
     }
 
     /// <summary>
@@ -157,16 +147,13 @@ public class BotController : MonoBehaviour
         {
             atackCollider.enabled = false;
 
-            move.SetMoveInput(Vector2.zero);
+            OnMove(Vector2.zero);
             atack.Attack(AttackState.Atatck);
 
             previousPlayer = curentTarget;
             nearPlayer = null;
             curentTarget = null;
-            isAttacker = false;
-
-            time = delaiTime;
-            isDelai = false;
+            isAttack = false;
         }
     }
 

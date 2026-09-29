@@ -48,10 +48,11 @@ public class StateManager : MonoBehaviour
     public AtackPower attackPower { get;private set; }   = AtackPower.None;
     public State state { get; private set; } = State.None;
 
+    public AttackState Attack() => attackState;
+
     /// <summary>
     /// ステート更新
     /// </summary>
-
     public void UpdateMoveState(Vector2 inputVer)
     {
         moveState = inputVer.sqrMagnitude > 0.01 ? MoveState.Walk:MoveState.Idel;
