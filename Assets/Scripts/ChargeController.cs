@@ -5,39 +5,42 @@ using UnityEngine.UI;
 public class ChargeController : MonoBehaviour
 {
     [SerializeField] private float maxChargeTime = 1.5f;
+    [SerializeField] private float maxPos = 500f;
+    [SerializeField] private Image image;
+    RectTransform pos;
+    Vector2 initPos = new Vector2(0, 250);
 
     private AtackController ac;
     private StateManager stateManager;
-
-    [SerializeField] private Image image;
-
-    private float upSpeed = 1.0f;
-    private Coroutine meter;
 
     private void Awake()
     {
         ac = GetComponent<AtackController>();
         stateManager = GetComponent<StateManager>();
-        image.fillAmount = 0;
+
+        pos = image.rectTransform;
+        pos.anchoredPosition = initPos;
     }
 
     private void Update()
     {
-        float speed = 1f / maxChargeTime;
-        if(stateManager.attackState == AttackState.Charge)
+
+        if (stateManager.attackState == AttackState.Charge)
         {
-            image.fillAmount += speed * Time.deltaTime;
+            float speed = (maxPos - initPos.y) / maxChargeTime;
+            float height = pos.anchoredPosition.y;
+            height += speed * Time.deltaTime;
+
+            height = Mathf.Clamp(height, initPos.y, maxPos);
+
+            pos.anchoredPosition = new Vector2(initPos.x,height);
+            float chargeRate = (height - initPos.y) / (maxPos - initPos.y);
+            ac.SetCharge(chargeRate);
         }
         else
         {
-            image.fillAmount = 0;
-        }
-        if(stateManager.state == State.KnockBack)
-        {
-            image.fillAmount = 0;
-        }
-        //0~1ÇÃîÕàÕêßå¿
-        image.fillAmount = Mathf.Clamp01(image.fillAmount);
-        ac.SetCharge(image.fillAmount);
+            pos.anchoredPosition = initPos;
+            ac.SetCharge(0);
+        } 
     }
 }

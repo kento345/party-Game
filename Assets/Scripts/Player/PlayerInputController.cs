@@ -29,7 +29,6 @@ public class PlayerInputController : MonoBehaviour
         //入力の更新
         //state.UpdateMoveState(inputVer);
         move.SetMoveInput(inputVer);
-
     }
 
     public void OnAtack(InputAction.CallbackContext context)
