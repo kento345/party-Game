@@ -102,9 +102,7 @@ public class BotController : MonoBehaviour
                 isAttack = true;
             }
         }
-        //近いPlayerに移動
-        Debug.Log(state.attackState);
-       
+        //近いPlayerに移動       
         if (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown && !isAttack)
         {
             NearPlayer();
