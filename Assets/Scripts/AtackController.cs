@@ -81,7 +81,7 @@ public class AtackController : MonoBehaviour
                 curentPower = stateManager.attackPower == AtackPower.Strong ? strongPower : weakPower;
 
                 var obj = Instantiate(bullet,new Vector3(transform.position.x,1f,transform.position.z + 1f),Quaternion.Euler(-20,0,0));
-                Debug.Log("生成");
+
             }
         }
     }
