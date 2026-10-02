@@ -49,7 +49,7 @@ public class ChargeController : MonoBehaviour
             pos.anchoredPosition = new Vector2(initPos.x,height);
             imageSize.sizeDelta = new Vector2(imageSize.sizeDelta.x, heightSize);
             float chargeRate = (height - initPos.y) / (maxPos - initPos.y);
-            ac.SetCharge(chargeRate);
+            ac.SetCharge(chargeRate, pointImage.transform.position);
         }
         else
         {

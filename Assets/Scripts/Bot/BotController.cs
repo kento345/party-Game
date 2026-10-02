@@ -29,7 +29,6 @@ public class BotController : MonoBehaviour
     private StateManager state;
     private MoveControlleer move;
     private AtackController atack;
-    private knockbackController knock;
 
 
 
@@ -38,7 +37,6 @@ public class BotController : MonoBehaviour
         state = GetComponent<StateManager>();
         move = GetComponent<MoveControlleer>();
         atack = GetComponent<AtackController>();
-        knock = GetComponent<knockbackController>();
     }
 
     // Update is called once per frame
@@ -95,7 +93,6 @@ public class BotController : MonoBehaviour
         if (wasKnockBack)
         {
             wasKnockBack = false;
-            curentTarget = knock.Target();
 
             if (curentTarget != null)
             {

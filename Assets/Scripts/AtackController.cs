@@ -8,13 +8,15 @@ public class AtackController : MonoBehaviour
 {
     [Header("攻撃設定")]
     [SerializeField] private GameObject bullet;//弾Prefab
+    private Vector3 curentAttackPos;            //現在の攻撃位置
+
     private float cooldown = 1.0f;          //攻撃クールダウン
     //-----チャージ-------
     private const float chargeMax = 1.0f;   //Maxチャージ量
     private float curentCharge = 0f;        //現在のチャージ量
-/*    //-----硬直---------
-    private float StrongRecoveryTime = 1.0f;//硬直時間
-    private float curentRecoveryTime;       //現在の硬直時間*/
+    /*    //-----硬直---------
+        private float StrongRecoveryTime = 1.0f;//硬直時間
+        private float curentRecoveryTime;       //現在の硬直時間*/
 
     [Header("ノックバック,無敵設定")]
     private float weakPower = 10.0f;    //弱ノックバック力
@@ -23,8 +25,6 @@ public class AtackController : MonoBehaviour
 
     [Header("当たり判定")]
     [SerializeField] LayerMask playerLayer;
-    [SerializeField] private float angle = 45f; //攻撃範囲
-    bool hasHit = false;
 
 
     Rigidbody rb;
@@ -43,9 +43,10 @@ public class AtackController : MonoBehaviour
     /// チャージゲージの同期
     /// </summary>
     /// <param name="value"></param>
-    public void SetCharge(float value)
+    public void SetCharge(float value, Vector3 attackPos = default(Vector3))
     {
         curentCharge = Mathf.Clamp01(value);
+        curentAttackPos = attackPos;
     }
 
     private void Update()
@@ -82,6 +83,12 @@ public class AtackController : MonoBehaviour
 
                 var obj = Instantiate(bullet,new Vector3(transform.position.x,1f,transform.position.z + 1f),Quaternion.Euler(-20,0,0));
 
+                var p = obj.GetComponent<BulletController>();
+                if(p != null)
+                {
+                    p.Shot(obj.transform.position, curentAttackPos);
+                    StartCoroutine(CooldownCount());
+                }
             }
         }
     }
