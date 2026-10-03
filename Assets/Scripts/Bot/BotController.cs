@@ -1,135 +1,67 @@
 ﻿using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BotController : MonoBehaviour
 {
     [Header("移動,回転設定")]
     Vector2 inputVer;           //入力方向
     float curentNearDistance;   //現在の近い距離
-    GameObject curentTarget;    //現在のターゲット
     GameObject nearPlayer;      //近くのPlayer  
     GameObject previousPlayer;  //前回のPlayer
 
 
-    public Vector2 InputVer() => inputVer;  //入力値を参照
+    public Vector2 InputVer => inputVer;  //入力値を参照
 
     [Header("攻撃設定")]
-    [SerializeField] private BoxCollider atackCollider; //攻撃判定
-    bool isAttack = false;
-    bool wasKnockBack = false;    //ノックバック中フラグ
+    
 
-
-    [Header("地面判定設定")]
-    [SerializeField]private LayerMask groundLayer;
+    [Header("判定設定")]
+    [SerializeField]private LayerMask playerLayaer;
+    [SerializeField] private LayerMask objLayer;
     private float rayDistance = 2;        //Rayの長さ
 
+    //-----Component-----
+    private NavMeshAgent agent;
 
 
-    //Script
+
+    //-----Script-----
     private StateManager state;
     private MoveControlleer move;
     private AtackController atack;
 
 
-
     void Start()
     {
         state = GetComponent<StateManager>();
-        move = GetComponent<MoveControlleer>();
+        move  = GetComponent<MoveControlleer>();
         atack = GetComponent<AtackController>();
+
+        agent = GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //初期化
-        var origin = transform.position + transform.forward * 1f + Vector3.up;
-        //Rayの作成
-        var ray = new Ray(origin, Vector3.down);
-        Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red, 0, false);
-
-        //Rayの当たり判定フラグ
-        bool hasGround = Physics.Raycast(ray, out RaycastHit hit, rayDistance, groundLayer);
-
-        //地面がない時
-        if (!hasGround)
-        {
-            OnMove(Vector2.zero);
-
-            curentTarget = null;
-            nearPlayer = null;
-
-            atackCollider.enabled = false;
-
-            NearPlayer();
-            curentTarget = nearPlayer;
-
-            if (curentTarget != null)
-            {
-                var dir = curentTarget.transform.position - transform.position;
-                dir.y = 0;
-
-                var normalize = dir.normalized;
-                inputVer = new Vector2(normalize.x, normalize.z);
-
-                // Player方向へ移動
-                move.SetMoveInput(inputVer);
-            }
-            else
-            {
-                OnMove(Vector2.zero);
-            }
-
-            return;
-        }
-        //ノックバック時移動拒否
-        if (state.state == State.KnockBack)
-        {
-            wasKnockBack = true;
-            OnMove(Vector2.zero);
-            return;
-        }
-        //攻撃受けた後のターゲット変更
-        if (wasKnockBack)
-        {
-            wasKnockBack = false;
-
-            if (curentTarget != null)
-            {
-                isAttack = true;
-            }
-        }
         //近いPlayerに移動       
-        if (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown && !isAttack)
+        if (state.attackState == AttackState.None || state.attackState == AttackState.Cooldown)
         {
             NearPlayer();
-            curentTarget = nearPlayer;
-        }
-
-        //チャージ開始
-        if (curentTarget != null)
-        {
-            //ターゲットの方向を取得して正規化
-            var dir = curentTarget.transform.position - transform.position;
-            dir.y = 0;
-            var nomalize = dir.normalized;
-            //正規化した方向をVector2に変換
-            inputVer = new Vector2(nomalize.x, nomalize.z);
-            if (state.state == State.None &&
-               (state.attackState == AttackState.None ||
-                state.attackState == AttackState.Cooldown ||
-                state.attackState == AttackState.Charge))
+            if(nearPlayer != null)
             {
-                //入力の更新
-                move.SetMoveInput(inputVer);
-            }
-            if (state.attackState == AttackState.None)
-            {
-                atack.Attack(AttackState.Charge);
-                atackCollider.enabled = true;
+                agent.destination = nearPlayer.transform.position;
+                if(agent.remainingDistance <= agent.stoppingDistance)
+                {
+                    OnMove(Vector2.zero);
+                }
+                else
+                {
+                    Vector3 dir = (nearPlayer.transform.position - transform.position).normalized;
+                    OnMove(new Vector2(dir.x, dir.z));
+                }
             }
         }
-
     }
 
     /// <summary>
@@ -138,17 +70,13 @@ public class BotController : MonoBehaviour
     /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     { 
-        if(other.gameObject == curentTarget)
+        if(other.gameObject == nearPlayer)
         {
-            atackCollider.enabled = false;
-
             OnMove(Vector2.zero);
             atack.Attack(AttackState.Atatck);
 
-            previousPlayer = curentTarget;
+            previousPlayer = nearPlayer;
             nearPlayer = null;
-            curentTarget = null;
-            isAttack = false;
         }
     }
 
@@ -198,6 +126,7 @@ public class BotController : MonoBehaviour
      * 1:近くの敵を探索
      * 2:ターゲットの方向に移動
      * 3:距離によって攻撃開始
-     * 4:攻撃後待機させ再度探索
+     * 4:Objectに当たりそうなら回避行動
+     * 5:
      */
 }

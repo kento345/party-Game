@@ -28,11 +28,11 @@ public class AnimationController : MonoBehaviour
        
         if (inpCon != null) {
             
-                mag = inpCon.InputVer().magnitude;
+                mag = inpCon.InputVer.magnitude;
         }
         if(botCon != null)
         {
-            mag = botCon.InputVer().magnitude;
+            mag = botCon.InputVer.magnitude;
         }
 
         animator.SetFloat("Speed",mag);

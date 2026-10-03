@@ -3,8 +3,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputController : MonoBehaviour
 {
+    //入力値
     Vector2 inputVer;
+    //入力値を参照
+    public Vector2 InputVer => inputVer;
 
+    //-----Script-----
     private StateManager state;
     private MoveControlleer move;
     private AtackController atack;
@@ -41,9 +45,5 @@ public class PlayerInputController : MonoBehaviour
         {
             atack.Attack(AttackState.Atatck);
         }
-    }
-    public Vector2 InputVer()
-    {
-        return inputVer;
     }
 }
