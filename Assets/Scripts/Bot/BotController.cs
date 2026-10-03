@@ -14,7 +14,8 @@ public class BotController : MonoBehaviour
     public Vector2 InputVer => inputVer;  //入力値を参照
 
     [Header("攻撃設定")]
-    
+
+    private float attackRange = .0f;
 
     [Header("判定設定")]
     [SerializeField]private LayerMask playerLayaer;
@@ -28,14 +29,12 @@ public class BotController : MonoBehaviour
 
     //-----Script-----
     private StateManager state;
-    private MoveControlleer move;
     private AtackController atack;
 
 
     void Start()
     {
         state = GetComponent<StateManager>();
-        move  = GetComponent<MoveControlleer>();
         atack = GetComponent<AtackController>();
 
         agent = GetComponent<NavMeshAgent>();
@@ -50,16 +49,36 @@ public class BotController : MonoBehaviour
             NearPlayer();
             if(nearPlayer != null)
             {
+                //ターゲットの方向に追跡
                 agent.destination = nearPlayer.transform.position;
-                if(agent.remainingDistance <= agent.stoppingDistance)
+                //移動量の保持
+                inputVer = new Vector2(agent.velocity.x,agent.velocity.z);
+                //更新
+                OnMove(inputVer);
+                if (agent.remainingDistance <= 10f && !agent.pathPending)
                 {
+                    Debug.Log("チャージ");
+                    atack.Attack(AttackState.Charge);
+                    attackRange = AttackRange();
                     OnMove(Vector2.zero);
+
                 }
+
                 else
                 {
-                    Vector3 dir = (nearPlayer.transform.position - transform.position).normalized;
-                    OnMove(new Vector2(dir.x, dir.z));
+                    agent.isStopped = false;
                 }
+            }
+        }
+        if(state.attackState == AttackState.Charge)
+        {
+            if (agent.remainingDistance <= attackRange)
+            {
+                Debug.Log("攻撃");
+                agent.isStopped = true;
+                atack.Attack(AttackState.Atatck);
+/*                previousPlayer = nearPlayer;
+                nearPlayer = null;*/
             }
         }
     }
@@ -68,17 +87,16 @@ public class BotController : MonoBehaviour
     /// 攻撃開始判定処理
     /// </summary>
     /// <param name="other"></param>
-    private void OnTriggerEnter(Collider other)
+/*    private void OnTriggerEnter(Collider other)
     { 
         if(other.gameObject == nearPlayer)
         {
             OnMove(Vector2.zero);
             atack.Attack(AttackState.Atatck);
 
-            previousPlayer = nearPlayer;
-            nearPlayer = null;
+
         }
-    }
+    }*/
 
     /// <summary>
     /// 最も近いプレイヤーを検索し、nearPlayer と curentNearDistance を更新する。
@@ -97,8 +115,7 @@ public class BotController : MonoBehaviour
         foreach (var p in GameManager.Instance.playerList)
         {
             //自身は除外
-            if (p == gameObject) continue;
-            if(p == previousPlayer) continue;
+            if (p == gameObject || p == previousPlayer || p == null) continue;
 
             //2点間の距離計算
             var dist = Vector3.Distance(transform.position, p.transform.position);
@@ -110,6 +127,11 @@ public class BotController : MonoBehaviour
         }
     }
 
+    float AttackRange()
+    {
+        return Random.Range(2, 5);
+    }
+
     /// <summary>
     /// 入力値などの変更
     /// </summary>
@@ -117,7 +139,6 @@ public class BotController : MonoBehaviour
     void OnMove(Vector2 context)
     {
         state.UpdateMoveState(context);
-        move.SetMoveInput(context);
         inputVer = context;
     }
 
