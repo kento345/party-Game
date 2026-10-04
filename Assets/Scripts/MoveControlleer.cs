@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MoveControlleer : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class MoveControlleer : MonoBehaviour
     private float rotaSpeed2 = 0f;//チャージ中の回転速度
     [SerializeField] private float rotaRate = 0.7f;//回転速度低下率
     private float curentRotaSpeed = 0f;//現在の回転速度
+    public float GetRotaSpeed => curentRotaSpeed;
 
     Vector2 inputVer;  //移動入力
     Rigidbody rb;
@@ -54,14 +56,12 @@ public class MoveControlleer : MonoBehaviour
         if (stateManager.attackState != AttackState.Atatck)
         {
             //移動処理
-            Vector3 move = new Vector3(inputVer.x, 0, inputVer.y) * curentSpeed * Time.fixedDeltaTime;
+            Vector3 move = transform.forward * inputVer.y * curentSpeed * Time.fixedDeltaTime;
             rb.MovePosition(rb.position + move);
             //回転処理
-            if (move != Vector3.zero)
-            {
-                Quaternion Rot = Quaternion.LookRotation(move, Vector3.up);
-                rb.MoveRotation(Quaternion.Slerp(rb.rotation, Rot, curentRotaSpeed * Time.fixedDeltaTime));
-            }
+            var rota = inputVer.x * curentRotaSpeed * Time.fixedDeltaTime;
+            var Rot = Quaternion.Euler(0,rota,0);
+            rb.MoveRotation(rb.rotation * Rot);
             stateManager.UpdateMoveState(inputVer);
         }
     }

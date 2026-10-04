@@ -14,6 +14,9 @@ public class AtackController : MonoBehaviour
     //-----チャージ-------
     private const float chargeMax = 1.0f;   //Maxチャージ量
     private float curentCharge = 0f;        //現在のチャージ量
+
+    private GameObject curentBullet;
+
     /*    //-----硬直---------
         private float StrongRecoveryTime = 1.0f;//硬直時間
         private float curentRecoveryTime;       //現在の硬直時間*/
@@ -56,6 +59,7 @@ public class AtackController : MonoBehaviour
         {
             stateManager.SetAttackPower(AtackPower.Strong);
         }
+
     }
 
     /// <summary>
@@ -71,7 +75,7 @@ public class AtackController : MonoBehaviour
             stateManager.SetAttackState(state);
         }
         //攻撃開始
-        if (state == AttackState.Atatck)
+        if (state == AttackState.Atatck && curentBullet == null)
         {
             if (stateManager.attackState == AttackState.Cooldown) { return; }
 
@@ -80,17 +84,25 @@ public class AtackController : MonoBehaviour
                 stateManager.SetAttackState(state);
                 //attackPowerステートがStrongならstrongPower,それ以外ならweakPower
                 curentPower = stateManager.attackPower == AtackPower.Strong ? strongPower : weakPower;
+                var y = transform.eulerAngles.y;
+                curentBullet = Instantiate(bullet,new Vector3(transform.position.x,1f,transform.position.z + 1f),Quaternion.Euler(-20,y,0));
 
-                var obj = Instantiate(bullet,new Vector3(transform.position.x,1f,transform.position.z + 1f),Quaternion.Euler(-20,0,0));
-
-                var p = obj.GetComponent<BulletController>();
+                var p = curentBullet.GetComponent<BulletController>();
                 if(p != null)
                 {
-                    p.Shot(obj.transform.position, curentAttackPos);
+                    p.SetAttackController(this,y);
+                    p.Shot(curentBullet.transform.position, curentAttackPos);
                     StartCoroutine(CooldownCount());
                 }
+
             }
         }
+    }
+
+    public void BulletDestory()
+    {
+        curentBullet = null;
+        //StartCoroutine(CooldownCount());
     }
 
     /// <summary>
