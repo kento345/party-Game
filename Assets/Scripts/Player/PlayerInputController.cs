@@ -20,6 +20,12 @@ public class PlayerInputController : MonoBehaviour
         atack = GetComponent<AtackController>();
     }
 
+    public void OnMoveStop(bool x)
+    {
+        move.enabled = x;
+        atack.enabled = x;
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         //ノックバック時移動拒否

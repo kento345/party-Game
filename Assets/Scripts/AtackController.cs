@@ -65,6 +65,7 @@ public class AtackController : MonoBehaviour
     /// <param name="x"></param>
     public void Attack(AttackState state)
     {
+        if (!enabled) {return; }
         //チャージ開始(ステートをチャージ中に)
         if (state == AttackState.Charge)
         {

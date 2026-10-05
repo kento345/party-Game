@@ -17,7 +17,7 @@ public class JoinController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI p3text;
     [SerializeField] private TextMeshProUGUI p4text;
     private Dictionary<InputDevice, int> playerMap = new();
-    [SerializeField] private List<string> debugDevices = new();
+    [SerializeField] private Transform[] pos = default;
 
     private void Awake()
     {
@@ -91,19 +91,12 @@ public class JoinController : MonoBehaviour
             playerIndex: id,
             pairWithDevice: device);
 
-        obj.transform.position = transform.position;
+        obj.transform.position = pos[id].transform.position;
+        obj.transform.rotation = pos[id].transform.rotation;
         var input = obj.GetComponent<PlayerInputController>();
+        if(input != null) { input.OnMoveStop(false); }
 
-        /*        if (input != null)
-                {
-                    input.OnMoveStop(false);
-                }*/
-
-        JoinDataHolder.instance.SetPlayerData(
-            obj.gameObject,
-            id + 1
-        );
-
+        JoinDataHolder.instance.SetPlayerData(obj.gameObject,id + 1);
         DontDestroyOnLoad(obj);
     }
 
@@ -112,6 +105,14 @@ public class JoinController : MonoBehaviour
         if(playerMap.Count <= 0) { return; }
         startAction.Disable();
         joinAction.Disable();
+
+        foreach(var p in JoinDataHolder.instance.GetPlayerData.Keys)
+        {
+            foreach (var child in p.GetComponentsInChildren<Transform>())
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
 
         SceneManager.LoadScene("MainGame");
     }

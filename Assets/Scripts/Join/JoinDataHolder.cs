@@ -5,8 +5,10 @@ using UnityEngine.InputSystem;
 public class JoinDataHolder : MonoBehaviour
 {
     public static JoinDataHolder instance { get; private set;}
-    private Dictionary<GameObject, int> playerDevice = new ();
-    public Dictionary<GameObject, int> GetPlayerData => playerDevice;
+    private Dictionary<GameObject, int> playerData= new ();
+    //参照専用
+    public IReadOnlyDictionary<GameObject, int> GetPlayerData => playerData;
+
 
     private void Awake()
     {
@@ -21,6 +23,6 @@ public class JoinDataHolder : MonoBehaviour
 
     public void SetPlayerData(GameObject player,int id)
     {
-        playerDevice.Add(player, id);
+        playerData.Add(player, id);
     }
 }

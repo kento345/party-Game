@@ -24,11 +24,16 @@ public class GameManager : MonoBehaviour
         {
             player.Key.transform.position = pos[player.Value - 1].position;
             player.Key.transform.rotation = pos[player.Value - 1].rotation;
+            foreach (var child in player.Key.GetComponentsInChildren<Transform>(true))
+            {
+                child.gameObject.SetActive(true);
+            }
         }
         int i = players.Count;
         while(i < pos.Length)
         {
             var bot = Instantiate(botPreefab, pos[i].position, pos[i].rotation);
+            JoinDataHolder.instance.SetPlayerData(bot, i + 1);
             i++;
         }
     }

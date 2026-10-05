@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class BotController : MonoBehaviour
 {
     [Header("移動,回転設定")]
-    [SerializeField] private float walkRange; //巡回範囲
     Vector2 inputVer;           //入力方向
     float curentNearDistance;   //現在の近い距離
     GameObject nearPlayer;      //近くのPlayer  
@@ -19,11 +18,9 @@ public class BotController : MonoBehaviour
     public Vector2 InputVer => inputVer;  //入力値を参照
 
     [Header("攻撃設定")]
-    private float maxChargeDis = 5f;
-    private float targetCharge;
-    private float currentCharge;
     private bool wasAttack = false;
-    private float repositionTimer;
+    private Vector3 moveTarget;
+    private bool hasMove = false;
 
     [Header("判定")]
     [SerializeField] private LayerMask objectLayer;
@@ -53,6 +50,23 @@ public class BotController : MonoBehaviour
     void Update()
     {
         if (state.attackState == AttackState.Atatck) { return; }
+        if (wasAttack)
+        {
+            if (!hasMove)
+            {
+                moveTarget = new Vector3(Random.Range(-8, 8), 0.5f, Random.Range(-8, 8));
+                hasMove = true;
+            }
+            Chase(moveTarget);
+            var dist = Vector3.Distance(transform.position, moveTarget);
+            if (dist < 2f)
+            {
+                wasAttack = false;
+                hasMove = false;
+                nearPlayer = null;
+                return;
+            }
+        }
         if (CheckObj() && !isRota)
         {
             isRota = true;
@@ -79,9 +93,10 @@ public class BotController : MonoBehaviour
             NearPlayer();
             return;
         }
+        //ターゲットがいる
         else
         {
-            Chase();
+            Chase(nearPlayer.transform.position);
 
             var dist = Vector3.Distance(transform.position, nearPlayer.transform.position);
             if (dist < 7f)
@@ -94,6 +109,9 @@ public class BotController : MonoBehaviour
                 {
                     OnMove(new Vector2(localDir.x,0));
                     atack.Attack(AttackState.Atatck);
+                    previousPlayer = nearPlayer;
+                    nearPlayer = null;
+                    wasAttack = true;
                 }
             }
         }
@@ -133,7 +151,9 @@ public class BotController : MonoBehaviour
         {
             //自身は除外
             if (p == gameObject || p == previousPlayer || p == null) continue;
-
+            // 死亡しているなら除外
+            if (!p.transform.GetChild(0).gameObject.activeSelf)
+                continue;
             //2点間の距離計算
             var dist = Vector3.Distance(transform.position, p.transform.position);
             if (dist < curentNearDistance)
@@ -144,13 +164,15 @@ public class BotController : MonoBehaviour
         }
     }
 
-    void Chase()
+    /// <summary>
+    /// 追跡処理
+    /// </summary>
+    void Chase(Vector3 targetPosition)
     {
-        var dir = nearPlayer.transform.position - transform.position;
+        var dir = targetPosition - transform.position;
         dir.y = 0f;
         var localDir = transform.InverseTransformDirection(dir.normalized);
         inputVer = new Vector2 (localDir.x, localDir.z);
-
         OnMove(inputVer);
     }
 
@@ -162,6 +184,12 @@ public class BotController : MonoBehaviour
     {
         move.SetMoveInput(context);
         inputVer = context;
+    }
+
+    public void OnMoveStop(bool x)
+    {
+        move.enabled = x;
+        atack.enabled = x;
     }
 
     /*
