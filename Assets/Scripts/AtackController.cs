@@ -26,9 +26,6 @@ public class AtackController : MonoBehaviour
     private float strongPower = 20.0f;  //強ノッコバック力
     private float curentPower = 0.0f;   //現在のコックバック力
 
-    [Header("当たり判定")]
-    [SerializeField] LayerMask playerLayer;
-
 
     Rigidbody rb;
     StateManager stateManager;

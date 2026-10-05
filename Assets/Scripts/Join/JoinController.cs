@@ -27,7 +27,7 @@ public class JoinController : MonoBehaviour
         startAction.Enable();
         startAction.performed += OnGameStart;
 
-        UpdateText(false);
+        //UpdateText(false);
     }
 
     private void OnDestroy()
@@ -52,6 +52,7 @@ public class JoinController : MonoBehaviour
         playerMap.Add(device, playerID);
 
         UpdateText(true);
+        CreatePlayer(device, playerID);
     }
 
     /// <summary>
@@ -67,7 +68,6 @@ public class JoinController : MonoBehaviour
                 var device = p.Key;
                 var playerID = p.Value;
 
-                texts[playerID].enabled = true;
                 texts[playerID].text = $"Push A To Join";
             }
         }
@@ -78,8 +78,7 @@ public class JoinController : MonoBehaviour
                 var device = p.Key;
                 var playerID = p.Value;
 
-                texts[playerID - 1].enabled = true;
-                texts[playerID - 1].text = $"Player {playerID}\nJoined";
+                texts[playerID].text = $"Player {playerID + 1}\nJoined";
             }
         }
     }
