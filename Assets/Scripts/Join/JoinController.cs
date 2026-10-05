@@ -9,6 +9,7 @@ public class JoinController : MonoBehaviour
     [Header("参加設定")]
     [SerializeField] private InputAction joinAction = default;
     [SerializeField] private InputAction startAction = default;
+    [SerializeField] private GameObject playerPrefab = default;
     private int maxPlayer = 4;
     //-----Text-----
     [SerializeField] private TextMeshProUGUI p1text;
@@ -25,11 +26,16 @@ public class JoinController : MonoBehaviour
         joinAction.performed += OnJoin;
         startAction.Enable();
         startAction.performed += OnGameStart;
+
+        UpdateText(false);
     }
 
-    private void Start()
+    private void OnDestroy()
     {
-        
+        joinAction.performed -= OnJoin;
+        joinAction.Disable();
+        startAction.performed -= OnGameStart;
+        startAction.Disable();
     }
 
     /// <summary>
@@ -42,24 +48,64 @@ public class JoinController : MonoBehaviour
         //既に参加済み,4人以上参加してたらreturn
         if (playerMap.ContainsKey(device) || playerMap.Count >= maxPlayer) { return; }
 
-        int playerID = playerMap.Count + 1;
+        int playerID = playerMap.Count;
         playerMap.Add(device, playerID);
 
-        UpdateText();
+        UpdateText(true);
     }
 
-    void UpdateText()
+    /// <summary>
+    /// Textの更新
+    /// </summary>
+    void UpdateText(bool a)
     {
         TextMeshProUGUI[] texts = {p1text,p2text, p3text, p4text};
-
-        foreach (var p in playerMap)
+        if (!a)
         {
-            var device = p.Key;
-            var playerID = p.Value;
+            foreach (var p in playerMap)
+            {
+                var device = p.Key;
+                var playerID = p.Value;
 
-            texts[playerID - 1].enabled = true;
-            texts[playerID - 1].text = $"Player {playerID}\nJoined";
+                texts[playerID].enabled = true;
+                texts[playerID].text = $"Push A To Join";
+            }
         }
+        if (a)
+        {
+            foreach (var p in playerMap)
+            {
+                var device = p.Key;
+                var playerID = p.Value;
+
+                texts[playerID - 1].enabled = true;
+                texts[playerID - 1].text = $"Player {playerID}\nJoined";
+            }
+        }
+    }
+
+    void CreatePlayer(InputDevice device,int id)
+    {
+        if(device == null) { return; }
+        var obj = PlayerInput.Instantiate(
+            prefab: playerPrefab,
+            playerIndex: id,
+            pairWithDevice: device);
+
+        obj.transform.position = transform.position;
+        var input = obj.GetComponent<PlayerInputController>();
+
+/*        if (input != null)
+        {
+            input.OnMoveStop(false);
+        }*/
+
+   /*     JoinDataHolder.instance.SetPlayerData(
+            obj.gameObject,
+            id
+        );*/
+
+        DontDestroyOnLoad(obj);
     }
 
     public void OnGameStart(InputAction.CallbackContext context)
@@ -67,6 +113,7 @@ public class JoinController : MonoBehaviour
         if(playerMap.Count <= 0) { return; }
         startAction.Disable();
         joinAction.Disable();
+        JoinDataHolder.instance.SetPlayerData(playerMap);
 
         SceneManager.LoadScene("MainGame");
     }
