@@ -128,8 +128,8 @@ public class BotController : MonoBehaviour
         curentNearDistance = Mathf.Infinity;
         nearPlayer = null;
 
-        //PlayerListの中で一番近いPlayerを検索,取得
-        foreach (var p in GameManager.Instance.playerList)
+       /* //PlayerListの中で一番近いPlayerを検索,取得
+        foreach (var p in JoinDataHolder.instance.GetPlayerData.)
         {
             //自身は除外
             if (p == gameObject || p == previousPlayer || p == null) continue;
@@ -141,7 +141,7 @@ public class BotController : MonoBehaviour
                 curentNearDistance = dist;
                 nearPlayer = p;
             }
-        }
+        }*/
     }
 
     void Chase()

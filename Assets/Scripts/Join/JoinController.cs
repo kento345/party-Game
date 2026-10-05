@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -95,15 +95,15 @@ public class JoinController : MonoBehaviour
         obj.transform.position = transform.position;
         var input = obj.GetComponent<PlayerInputController>();
 
-/*        if (input != null)
-        {
-            input.OnMoveStop(false);
-        }*/
+        /*        if (input != null)
+                {
+                    input.OnMoveStop(false);
+                }*/
 
-   /*     JoinDataHolder.instance.SetPlayerData(
+        JoinDataHolder.instance.SetPlayerData(
             obj.gameObject,
-            id
-        );*/
+            id + 1
+        );
 
         DontDestroyOnLoad(obj);
     }
@@ -113,7 +113,6 @@ public class JoinController : MonoBehaviour
         if(playerMap.Count <= 0) { return; }
         startAction.Disable();
         joinAction.Disable();
-        JoinDataHolder.instance.SetPlayerData(playerMap);
 
         SceneManager.LoadScene("MainGame");
     }

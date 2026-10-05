@@ -23,9 +23,12 @@ public class GameManager : MonoBehaviour
         joinObj = JoinDataHolder.instance.gameObject;
 
         //インスタンスで保持しているPlayer情報を取得
-        var device = JoinDataHolder.instance.GetPlayerData;
+        var players = JoinDataHolder.instance.GetPlayerData;
 
-
+        for(int i = 0; i < players.Count; i++)
+        {
+            //players[]
+        }
     }
 
     void Start()
