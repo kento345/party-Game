@@ -20,12 +20,11 @@ public class PlayerInputController : MonoBehaviour
         atack = GetComponent<AtackController>();
     }
 
-    public void OnMoveStop(bool x)
-    {
-        move.enabled = x;
-        atack.enabled = x;
-    }
 
+    /// <summary>
+    /// 移動処理
+    /// </summary>
+    /// <param name="context"></param>
     public void OnMove(InputAction.CallbackContext context)
     {
         //ノックバック時移動拒否
@@ -41,6 +40,11 @@ public class PlayerInputController : MonoBehaviour
         move.SetMoveInput(inputVer);
     }
 
+
+    /// <summary>
+    /// 攻撃処理
+    /// </summary>
+    /// <param name="context"></param>
     public void OnAtack(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -51,5 +55,28 @@ public class PlayerInputController : MonoBehaviour
         {
             atack.Attack(AttackState.Atatck);
         }
+    }
+
+    /// <summary>
+    /// 死亡処理(子供オブジェクトを非表示)
+    /// </summary>
+    /// <param name="x"></param>
+    public void OnDeath(bool x)
+    {
+        foreach (Transform t in transform)
+        {
+            t.gameObject.SetActive(x);
+        }
+    }
+
+    /// <summary>
+    /// 移動,攻撃処理を停止
+    /// </summary>
+    /// <param name="x"></param>
+    public void OnMoveStop(bool x)
+    {
+        if (move == null || atack == null) { return; }
+        move.enabled = x;
+        atack.enabled = x;
     }
 }

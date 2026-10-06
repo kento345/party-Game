@@ -6,19 +6,31 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance { get; private set; }
     [SerializeField] private GameObject botPreefab = default;
     [SerializeField] private Transform[] pos = default;
-
     private GameObject joinObj;
+
+/*    private List<GameObject> playerList = new();
+
+    public List<GameObject> GetPlayerList => playerList;*/
 
     void Awake()
     {
-        if(JoinDataHolder.instance == null) { return; }
+        if(instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+
+        if (JoinDataHolder.instance == null) { return; }
         //DontDestoryObjectを取得
         joinObj = JoinDataHolder.instance.gameObject;
         
         //インスタンスで保持しているPlayer情報を取得
         var players = JoinDataHolder.instance.GetPlayerData;
+        //playerList = new List<GameObject>(players.Keys);
 
         foreach (var player in players)
         {
@@ -40,7 +52,7 @@ public class GameManager : MonoBehaviour
 
     public void OnReset()
     {
-        SceneManager.LoadScene("");
         Destroy(joinObj);
+        SceneManager.LoadScene("");
     }
 }

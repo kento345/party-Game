@@ -7,8 +7,8 @@ public class JoinDataHolder : MonoBehaviour
     public static JoinDataHolder instance { get; private set;}
     private Dictionary<GameObject, int> playerData= new ();
     //参照専用
+    
     public IReadOnlyDictionary<GameObject, int> GetPlayerData => playerData;
-
 
     private void Awake()
     {

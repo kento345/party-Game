@@ -36,6 +36,7 @@ public class BotController : MonoBehaviour
     //-----Script-----
     private StateManager state;
     private AtackController atack;
+    private SensorController sensor;
     MoveControlleer move;
 
 
@@ -44,6 +45,7 @@ public class BotController : MonoBehaviour
         state = GetComponent<StateManager>();
         atack = GetComponent<AtackController>();
         move  = GetComponent<MoveControlleer>();
+        sensor = GetComponentInChildren<SensorController>();
     }
 
     // Update is called once per frame
@@ -105,13 +107,28 @@ public class BotController : MonoBehaviour
                 var dir = nearPlayer.transform.position - transform.position;
                 dir.y = 0;
                 var localDir = transform.InverseTransformDirection(dir.normalized);
-                if (dist < 4f)
+                if (sensor.IsHit)
                 {
-                    OnMove(new Vector2(localDir.x,0));
                     atack.Attack(AttackState.Atatck);
                     previousPlayer = nearPlayer;
                     nearPlayer = null;
                     wasAttack = true;
+                    return;
+                }
+                if (dist < 4f)
+                {
+                    // 相手の方向を向く
+                    OnMove(new Vector2(localDir.x, 0));
+
+                    // 相手の方向誤差0.1以内なら攻撃
+                    if (Mathf.Abs(localDir.x) < 0.5f)
+                    {
+                        atack.Attack(AttackState.Atatck);
+
+                        previousPlayer = nearPlayer;
+                        nearPlayer = null;
+                        wasAttack = true;
+                    }
                 }
             }
         }
@@ -150,10 +167,14 @@ public class BotController : MonoBehaviour
         foreach (var p in JoinDataHolder.instance.GetPlayerData.Keys)
         {
             //自身は除外
-            if (p == gameObject || p == previousPlayer || p == null) continue;
+            if (p == gameObject || p == null) continue;
             // 死亡しているなら除外
-            if (!p.transform.GetChild(0).gameObject.activeSelf)
-                continue;
+            var life = p.GetComponent<HitController>();
+            if(life != null)
+            {
+                if (!life.IsAlive) continue;
+            }
+
             //2点間の距離計算
             var dist = Vector3.Distance(transform.position, p.transform.position);
             if (dist < curentNearDistance)
@@ -186,10 +207,27 @@ public class BotController : MonoBehaviour
         inputVer = context;
     }
 
+    /// <summary>
+    /// 移動,攻撃処理を停止
+    /// </summary>
+    /// <param name="x"></param>
     public void OnMoveStop(bool x)
     {
+        if (move == null || atack == null) { return; }
         move.enabled = x;
         atack.enabled = x;
+    }
+
+    /// <summary>
+    /// 死亡処理(子供オブジェクトを非表示に)
+    /// </summary>
+    /// <param name="x"></param>
+    public void OnDeath(bool x)
+    {
+        foreach (Transform t in transform)
+        {
+            t.gameObject.SetActive(x);
+        }
     }
 
     /*
