@@ -7,6 +7,7 @@ public class ColorChange : MonoBehaviour
 
     PlayerInputController inputCon;
     BotController botCon;
+    StateManager state;
 
     private void OnEnable()
     {

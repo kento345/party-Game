@@ -25,4 +25,9 @@ public class JoinDataHolder : MonoBehaviour
     {
         playerData.Add(player, id);
     }
+
+    public void RemoveBotData(GameObject bot)
+    {
+        playerData.Remove(bot);
+    }
 }

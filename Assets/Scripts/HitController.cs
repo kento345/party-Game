@@ -9,6 +9,7 @@ public class HitController : MonoBehaviour
     /// </summary>
     public bool IsAlive => isAlive;
 
+
     private void Awake()
     {
         isAlive = true;

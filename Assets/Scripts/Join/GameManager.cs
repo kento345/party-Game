@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,9 +11,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject botPreefab = default;
     [SerializeField] private Transform[] pos = default;
     private GameObject joinObj;
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private TextMeshProUGUI resultText;
 
-    private List<HitController> lifeList = new();
-    int count = 0;
+    private Dictionary<GameObject,int> ActivePlayers = new();
+    private List<GameObject> botList = new();
 
     void Awake()
     {
@@ -34,7 +37,6 @@ public class GameManager : MonoBehaviour
         {
             player.Key.transform.position = pos[player.Value - 1].position;
             player.Key.transform.rotation = pos[player.Value - 1].rotation;
-            lifeList.Add(player.Key.GetComponent<HitController>());
             foreach (var child in player.Key.GetComponentsInChildren<Transform>(true))
             {
                 child.gameObject.SetActive(true);
@@ -45,34 +47,60 @@ public class GameManager : MonoBehaviour
         {
             var bot = Instantiate(botPreefab, pos[i].position, pos[i].rotation);
             JoinDataHolder.instance.SetPlayerData(bot, i + 1);
-            lifeList.Add(bot.GetComponent<HitController>());
+            botList.Add(bot);
             i++;
         }
+
+        ActivePlayers = new Dictionary<GameObject,int>(JoinDataHolder.instance.GetPlayerData);
+        Time.timeScale = 1.0f;
     }
 
     private void Update()
     {
-        foreach(var l in lifeList)
+        List<GameObject> deadPlayers = new();
+        Debug.Log(Time.timeScale);
+        foreach (var p in ActivePlayers)
         {
-            if (l.IsAlive)
-            {
-                count += 1;
-            }
-            else
-            {
-                count -= 1;
-            }
+            var life = p.Key.GetComponent<HitController>();
 
-            if(count == 1)
+            if (life != null && !life.IsAlive)
             {
-                Debug.Log("Wind");
+                deadPlayers.Add(p.Key);
+            }
+        }
+
+        foreach (var player in deadPlayers)
+        {
+            ActivePlayers.Remove(player);
+        }
+
+        if (ActivePlayers.Count == 1)
+        {
+            foreach (var p in ActivePlayers)
+            {
+                resultText.text = $"Win: {p.Key.name.Replace("(Clone)", "")}{p.Value}";
+                resultPanel.SetActive(true);
+                Time.timeScale = 0.0f;
             }
         }
     }
 
     public void OnReset()
     {
+        var currentScene = SceneManager.GetActiveScene().name;
+        if (JoinDataHolder.instance != null)
+        {
+            foreach (var bot in botList)
+            {
+                JoinDataHolder.instance.RemoveBotData(bot);
+            }
+        }
+        SceneManager.LoadScene(currentScene);
+    }
+
+    public void OnTitle()
+    {
         Destroy(joinObj);
-        SceneManager.LoadScene("");
+        SceneManager.LoadScene("JoinScene");
     }
 }
