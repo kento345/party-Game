@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Rendering;
 
 public class MoveControlleer : MonoBehaviour
 {
-    //数値の変更はpublicじゃなく関数で行う
     [Header("移動,回転設定")]
     [SerializeField] private float speed = 15f;//移動速度
     private float speed2 = 0f;//チャージ中の移動

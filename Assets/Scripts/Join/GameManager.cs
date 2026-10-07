@@ -11,9 +11,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform[] pos = default;
     private GameObject joinObj;
 
-/*    private List<GameObject> playerList = new();
-
-    public List<GameObject> GetPlayerList => playerList;*/
+    private List<HitController> lifeList = new();
+    int count = 0;
 
     void Awake()
     {
@@ -30,12 +29,12 @@ public class GameManager : MonoBehaviour
         
         //インスタンスで保持しているPlayer情報を取得
         var players = JoinDataHolder.instance.GetPlayerData;
-        //playerList = new List<GameObject>(players.Keys);
 
         foreach (var player in players)
         {
             player.Key.transform.position = pos[player.Value - 1].position;
             player.Key.transform.rotation = pos[player.Value - 1].rotation;
+            lifeList.Add(player.Key.GetComponent<HitController>());
             foreach (var child in player.Key.GetComponentsInChildren<Transform>(true))
             {
                 child.gameObject.SetActive(true);
@@ -46,7 +45,28 @@ public class GameManager : MonoBehaviour
         {
             var bot = Instantiate(botPreefab, pos[i].position, pos[i].rotation);
             JoinDataHolder.instance.SetPlayerData(bot, i + 1);
+            lifeList.Add(bot.GetComponent<HitController>());
             i++;
+        }
+    }
+
+    private void Update()
+    {
+        foreach(var l in lifeList)
+        {
+            if (l.IsAlive)
+            {
+                count += 1;
+            }
+            else
+            {
+                count -= 1;
+            }
+
+            if(count == 1)
+            {
+                Debug.Log("Wind");
+            }
         }
     }
 
