@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI resultText;
 
     private Dictionary<GameObject,int> ActivePlayers = new();
+    private List<GameObject> playerList = new();
     private List<GameObject> botList = new();
 
     void Awake()
@@ -100,6 +101,10 @@ public class GameManager : MonoBehaviour
 
     public void OnTitle()
     {
+        foreach(var p in JoinDataHolder.instance.GetPlayerData)
+        {
+            Destroy(p.Key);
+        }
         Destroy(joinObj);
         SceneManager.LoadScene("JoinScene");
     }
