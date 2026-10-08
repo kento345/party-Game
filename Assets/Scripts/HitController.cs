@@ -1,3 +1,4 @@
+﻿using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 
 public class HitController : MonoBehaviour
@@ -19,6 +20,13 @@ public class HitController : MonoBehaviour
     {
         if (((1 << collision.gameObject.layer) & bulletLayer) != 0)
         {
+            var b = collision.gameObject.GetComponent<BulletController>();
+            // BulletControllerがないなら無視
+            if (b == null)
+                return;
+            // 自分が撃ったBulletなら無視
+            if (b.Owner == gameObject)
+                return;
             foreach (Transform t in transform)
             {
                 t.gameObject.SetActive(false);

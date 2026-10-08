@@ -90,6 +90,7 @@ public class AtackController : MonoBehaviour
                 {
                     p.SetAttackController(this,y);
                     p.Shot(curentBullet.transform.position, curentAttackPos);
+                    p.SetOwner(gameObject);
                     StartCoroutine(CooldownCount());
                 }
 

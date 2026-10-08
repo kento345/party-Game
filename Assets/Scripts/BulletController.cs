@@ -7,6 +7,7 @@ public class BulletController : MonoBehaviour
     private float height = 1.5f;
 
     private float angle = 0;
+    public GameObject Owner { get; private set; }
 
     [SerializeField] private LayerMask hitLayer;
 
@@ -52,10 +53,24 @@ public class BulletController : MonoBehaviour
         rb.linearVelocity = velocity;
     }
 
+    /// <summary>
+    /// AttackController取得,方向取得
+    /// </summary>
+    /// <param name="controller"></param>
+    /// <param name="a"></param>
     public void SetAttackController(AtackController controller ,float a)
     {
         attack = controller;
         angle = a;
+    }
+
+    /// <summary>
+    /// 生成者を認識
+    /// </summary>
+    /// <param name="owner"></param>
+    public void SetOwner(GameObject owner)
+    {
+        Owner = owner;
     }
 
 
