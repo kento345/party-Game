@@ -1,7 +1,4 @@
-﻿using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
-using UnityEngine.AI;
+﻿using UnityEngine;
 
 public class BotController : MonoBehaviour
 {
@@ -51,6 +48,7 @@ public class BotController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
         if (state.attackState == AttackState.Atatck) { return; }
         if (wasAttack)
         {

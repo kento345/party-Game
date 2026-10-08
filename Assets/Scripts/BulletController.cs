@@ -74,9 +74,9 @@ public class BulletController : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (((1 << collision.gameObject.layer) & hitLayer) != 0)
+        if (((1 << other.gameObject.layer) & hitLayer) != 0)
         {
             attack.BulletDestory();
             var obj = Instantiate(exprosionPrefab, transform.position, Quaternion.identity);

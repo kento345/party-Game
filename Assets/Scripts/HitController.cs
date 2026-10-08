@@ -16,11 +16,11 @@ public class HitController : MonoBehaviour
         isAlive = true;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (((1 << collision.gameObject.layer) & bulletLayer) != 0)
+        if (((1 << other.gameObject.layer) & bulletLayer) != 0)
         {
-            var b = collision.gameObject.GetComponent<BulletController>();
+            var b = other.gameObject.GetComponent<BulletController>();
             // BulletControllerがないなら無視
             if (b == null)
                 return;
