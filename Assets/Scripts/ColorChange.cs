@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ColorChange : MonoBehaviour
 {
@@ -7,7 +8,8 @@ public class ColorChange : MonoBehaviour
 
     PlayerInputController inputCon;
     BotController botCon;
-    StateManager state;
+
+    Image image;
 
     private void OnEnable()
     {
@@ -39,41 +41,70 @@ public class ColorChange : MonoBehaviour
     private void Start()
     {
         MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        image = GetComponent<Image>();
 
-        foreach (var renderer in renderers)
+        var id = JoinDataHolder.instance.GetPlayerData[transform.root.gameObject];
+        if (renderers != null)
         {
-            foreach (var material in renderer.materials)
+            foreach (var renderer in renderers)
             {
-                if (material.name.Contains("TankColor"))
+                foreach (var material in renderer.materials)
                 {
-                    tankColors.Add(material);
+                    if (material.name.Contains("TankColor"))
+                    {
+                        tankColors.Add(material);
+                    }
                 }
             }
-        }
-        var id = JoinDataHolder.instance.GetPlayerData[transform.root.gameObject];
-        switch (id)
-        {
-            case 1:
-                SetColor(Color.red);
-                break;
-            case 2:
-                SetColor(Color.blue);
-                break;
-            case 3:
-                SetColor(Color.green);
-                break;
 
-            case 4:
-                SetColor(Color.yellow);
-                break;
+            switch (id)
+            {
+                case 1:
+                    SetColor(Color.red);
+                    break;
+                case 2:
+                    SetColor(Color.blue);
+                    break;
+                case 3:
+                    SetColor(Color.green);
+                    break;
+
+                case 4:
+                    SetColor(Color.yellow);
+                    break;
+            }
+        }
+
+        if(image != null)
+        {
+            switch (id)
+            {
+                case 1:
+                    SetImageColor(Color.red);
+                    break;
+                case 2:
+                    SetImageColor(Color.blue);
+                    break;
+                case 3:
+                    SetImageColor(Color.green);
+                    break;
+
+                case 4:
+                    SetImageColor(Color.yellow);
+                    break;
+            }
         }
     }
 
-    public void SetColor(Color color)
+    void SetColor(Color color)
     {
         foreach (var material in tankColors)
         {
             material.color = color;
         }
+    }
+    void SetImageColor(Color color)
+    {
+        image.color = color;
     }
 }

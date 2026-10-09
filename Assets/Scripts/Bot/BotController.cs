@@ -119,10 +119,10 @@ public class BotController : MonoBehaviour
                     OnMove(new Vector2(localDir.x, 0));
 
                     // 相手の方向誤差0.1以内なら攻撃
-                    if (Mathf.Abs(localDir.x) < 0.5f)
+                    if (Mathf.Abs(localDir.x) < 0.1f)
                     {
                         atack.Attack(AttackState.Atatck);
-
+                        
                         previousPlayer = nearPlayer;
                         nearPlayer = null;
                         wasAttack = true;

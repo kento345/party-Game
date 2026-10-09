@@ -84,14 +84,13 @@ public class AtackController : MonoBehaviour
                 curentPower = stateManager.attackPower == AtackPower.Strong ? strongPower : weakPower;
                 var y = transform.eulerAngles.y;
                 curentBullet = Instantiate(bullet,new Vector3(transform.position.x,1f,transform.position.z + 1f),Quaternion.Euler(-20,y,0));
-
+                StartCoroutine(CooldownCount());
                 var p = curentBullet.GetComponent<BulletController>();
                 if(p != null)
                 {
                     p.SetAttackController(this,y);
                     p.Shot(curentBullet.transform.position, curentAttackPos);
                     p.SetOwner(gameObject);
-                    StartCoroutine(CooldownCount());
                 }
 
             }
